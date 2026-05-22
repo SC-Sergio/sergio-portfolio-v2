@@ -45,6 +45,11 @@ a {
   text-underline-offset: 4px;
 }
 
+:where(a, button, [role="button"], input, textarea, select):focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 3px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
