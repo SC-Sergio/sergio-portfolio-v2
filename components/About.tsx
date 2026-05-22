@@ -22,16 +22,16 @@ const principles = [
 
 export default function About() {
   return (
-    <AnimatedSection id="about" className="cv-auto mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-        <div>
+    <AnimatedSection id="about" className="cv-auto mx-auto w-full max-w-[92rem] px-4 py-20 sm:px-6 lg:px-8">
+      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start xl:grid-cols-12">
+        <div className="xl:col-span-5">
           <p className="text-sm font-semibold text-emerald-200">Sobre mí</p>
           <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
             Desarrollo soluciones sobrias para problemas que necesitan orden y continuidad.
           </h2>
         </div>
 
-        <div className="space-y-6 text-base leading-8 text-zinc-300">
+        <div className="max-w-3xl space-y-6 text-base leading-8 text-zinc-300 xl:col-span-7 xl:ml-auto">
           <p>
             Soy Sergio Enrique Carey Alegre, Ingeniero Informático formado en Inacap. Trabajo principalmente con Python y Django, combinando desarrollo web, automatización, chatbots, IA aplicada y soporte técnico.
           </p>
@@ -41,7 +41,7 @@ export default function About() {
         </div>
       </div>
 
-      <div className="premium-surface mt-12 rounded-lg p-5">
+      <div className="premium-surface mt-12 rounded-lg p-5 md:p-6 xl:p-7">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-cyan-200">Perfil profesional</p>
@@ -63,12 +63,12 @@ export default function About() {
         </dl>
       </div>
 
-      <div className="mt-12 grid gap-4 md:grid-cols-3">
+      <div className="mt-12 grid gap-4 md:grid-cols-3 xl:gap-5">
         {principles.map((principle) => {
           const Icon = principle.icon;
 
           return (
-            <article key={principle.title} className="premium-card rounded-lg p-5">
+            <article key={principle.title} className="premium-card rounded-lg p-5 xl:p-6">
               <Icon size={22} className="text-cyan-200" aria-hidden="true" />
               <h3 className="mt-4 text-lg font-semibold text-white">{principle.title}</h3>
               <p className="mt-3 text-sm leading-7 text-zinc-300">{principle.text}</p>

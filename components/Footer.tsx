@@ -24,8 +24,8 @@ const footerLinks = [
 export default function Footer() {
   return (
     <footer className="cv-auto border-t border-cyan-200/[0.10] bg-[#050607]/70 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 text-sm text-zinc-400 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+      <div className="mx-auto flex w-full max-w-[92rem] flex-col gap-5 text-sm text-zinc-400 lg:flex-row lg:items-center lg:justify-between">
+        <div className="max-w-2xl">
           <p className="font-medium text-zinc-200">Sergio Enrique Carey Alegre - Ingeniero Informático</p>
           <p className="mt-1">Arica, Chile · Python, Django, IA, automatización y desarrollo web.</p>
         </div>

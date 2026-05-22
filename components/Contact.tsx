@@ -20,9 +20,9 @@ const contactLinks = [
 
 export default function Contact() {
   return (
-    <AnimatedSection id="contact" className="cv-auto mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="premium-surface grid gap-8 rounded-lg p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8">
-        <div>
+    <AnimatedSection id="contact" className="cv-auto mx-auto w-full max-w-[86rem] px-4 py-20 sm:px-6 lg:px-8">
+      <div className="premium-surface grid gap-8 rounded-lg p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8 xl:gap-10">
+        <div className="max-w-3xl">
           <p className="text-sm font-semibold text-emerald-200">Contacto</p>
           <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
             Conversemos sobre el sistema, bot o automatización que quieres construir.

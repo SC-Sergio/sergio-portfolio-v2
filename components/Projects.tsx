@@ -12,20 +12,20 @@ const accentClasses = [
 
 export default function Projects() {
   return (
-    <AnimatedSection id="projects" className="cv-auto relative mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-        <div className="max-w-2xl">
+    <AnimatedSection id="projects" className="cv-auto relative mx-auto w-full max-w-[92rem] px-4 py-20 sm:px-6 lg:px-8">
+      <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end xl:grid xl:grid-cols-12">
+        <div className="max-w-3xl xl:col-span-7">
           <p className="text-sm font-semibold text-emerald-200">Proyectos</p>
           <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
             Sistemas con foco en operación, automatización y experiencia de usuario.
           </h2>
         </div>
-        <p className="max-w-sm text-sm leading-7 text-zinc-400">
+        <p className="max-w-sm text-sm leading-7 text-zinc-400 xl:col-span-4 xl:col-start-9">
           Cada proyecto combina desarrollo técnico con decisiones de producto para que la solución sea usable en el día a día.
         </p>
       </div>
 
-      <div className="mt-10 grid gap-4 md:grid-cols-2">
+      <div className="mt-10 grid gap-4 md:grid-cols-2 xl:gap-5">
         {projects.map((project, index) => {
           const Icon = projectIcons[index] ?? ArrowUpRight;
           const accent = accentClasses[index] ?? accentClasses[0];
@@ -33,7 +33,7 @@ export default function Projects() {
           return (
             <article
               key={project.name}
-              className="premium-card group rounded-lg p-5"
+              className="premium-card group rounded-lg p-5 xl:p-6"
             >
               <div className="flex items-start justify-between gap-4">
                 <span className={`grid size-11 place-items-center rounded-md border border-white/10 shadow-[0_0_28px_rgba(34,211,238,0.06)] ${accent}`}>
@@ -51,7 +51,7 @@ export default function Projects() {
 
               <h3 className="mt-5 text-2xl font-semibold text-white">{project.name}</h3>
               <p className="mt-3 text-sm leading-7 text-zinc-300">{project.summary}</p>
-              <div className="mt-5 grid gap-3">
+              <div className="mt-5 grid gap-3 2xl:grid-cols-3">
                 <div className="border-l-2 border-violet-200/[0.35] pl-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Problema</p>
                   <p className="mt-2 text-sm leading-7 text-zinc-300">{project.problem}</p>
@@ -78,7 +78,7 @@ export default function Projects() {
         })}
       </div>
 
-      <div className="premium-surface mt-8 rounded-lg p-5">
+      <div className="premium-surface mt-8 rounded-lg p-5 md:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-cyan-200">Laboratorio / más proyectos</p>
