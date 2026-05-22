@@ -22,7 +22,7 @@ const principles = [
 
 export default function About() {
   return (
-    <AnimatedSection id="about" className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <AnimatedSection id="about" className="cv-auto mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div>
           <p className="text-sm font-semibold text-emerald-200">Sobre mí</p>

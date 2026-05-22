@@ -35,11 +35,11 @@ html {
 body {
   min-height: 100svh;
   background:
-    radial-gradient(circle at 18% -8%, rgba(45, 212, 191, 0.18), transparent 30rem),
-    radial-gradient(circle at 86% 2%, rgba(139, 92, 246, 0.14), transparent 32rem),
-    radial-gradient(circle at 62% 46%, rgba(16, 185, 129, 0.06), transparent 42rem),
-    linear-gradient(rgba(125, 211, 252, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(125, 211, 252, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 18% -8%, rgba(45, 212, 191, 0.14), transparent 30rem),
+    radial-gradient(circle at 86% 2%, rgba(139, 92, 246, 0.1), transparent 32rem),
+    radial-gradient(circle at 62% 46%, rgba(16, 185, 129, 0.045), transparent 42rem),
+    linear-gradient(rgba(125, 211, 252, 0.034) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.026) 1px, transparent 1px),
     linear-gradient(180deg, #050607 0%, #070b0c 44%, #050607 100%);
   background-size: auto, auto, auto, 68px 68px, 68px 68px, auto;
   color: var(--foreground);
@@ -76,53 +76,90 @@ a {
   position: absolute;
 }
 
-.premium-surface {
+.hero-orbit-stage {
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
-    var(--panel);
-  border: 1px solid var(--line);
+    radial-gradient(circle at 63% 44%, rgba(34, 211, 238, 0.09), transparent 17rem),
+    radial-gradient(circle at 78% 62%, rgba(139, 92, 246, 0.07), transparent 15rem),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035), transparent 38%, rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(125, 211, 252, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 24px 70px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(18px);
+    inset 0 1px 0 rgba(255, 255, 255, 0.055),
+    inset 0 0 0 1px rgba(110, 231, 183, 0.025);
+  pointer-events: none;
 }
 
-.premium-card {
+.hero-orbit-stage::before,
+.hero-orbit-stage::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+}
+
+.hero-orbit-stage::before {
+  border: 1px solid rgba(125, 211, 252, 0.08);
+  border-radius: inherit;
+  inset: 1.25rem;
+}
+
+.hero-orbit-stage::after {
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+    linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.24), transparent),
+    linear-gradient(180deg, transparent, rgba(110, 231, 183, 0.16), transparent);
+  height: 1px;
+  left: 10%;
+  opacity: 0.42;
+  right: 10%;
+  top: 50%;
+}
+
+.premium-surface {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.032)),
     var(--panel);
   border: 1px solid var(--line);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 18px 54px rgba(0, 0, 0, 0.2);
+    0 14px 38px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.premium-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.072), rgba(255, 255, 255, 0.025)),
+    var(--panel);
+  border: 1px solid var(--line);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 28px rgba(0, 0, 0, 0.18);
   isolation: isolate;
   position: relative;
   transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
 }
 
 .premium-card::after {
-  background: linear-gradient(135deg, rgba(103, 232, 249, 0.26), transparent 38%, rgba(167, 139, 250, 0.2));
+  background: linear-gradient(135deg, rgba(103, 232, 249, 0.16), transparent 38%, rgba(167, 139, 250, 0.12));
   border-radius: inherit;
   content: "";
   inset: -1px;
   opacity: 0;
   pointer-events: none;
   position: absolute;
-  transition: opacity 180ms ease;
+  transition: opacity 150ms ease;
   z-index: -1;
 }
 
 .premium-card:hover {
   border-color: var(--line-bright);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 22px 64px rgba(0, 0, 0, 0.26),
-    0 0 38px rgba(34, 211, 238, 0.08);
-  transform: translateY(-2px);
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 14px 34px rgba(0, 0, 0, 0.22),
+    0 0 20px rgba(34, 211, 238, 0.055);
+  transform: translateY(-1px);
 }
 
 .premium-card:hover::after {
@@ -138,7 +175,7 @@ a {
 .glow-button {
   box-shadow:
     0 0 0 1px rgba(110, 231, 183, 0.2),
-    0 18px 44px rgba(52, 211, 153, 0.22);
+    0 10px 26px rgba(52, 211, 153, 0.18);
 }
 
 .holographic-text {
@@ -149,6 +186,11 @@ a {
   display: inline-block;
   overflow: visible;
   padding-bottom: 0.06em;
+}
+
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 820px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -166,6 +208,18 @@ a {
   }
 
   .premium-card:hover {
+    border-color: var(--line);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 10px 28px rgba(0, 0, 0, 0.18);
     transform: none;
+  }
+
+  .premium-card:hover::after {
+    opacity: 0;
+  }
+
+  .glow-button {
+    box-shadow: 0 0 0 1px rgba(110, 231, 183, 0.18);
   }
 }

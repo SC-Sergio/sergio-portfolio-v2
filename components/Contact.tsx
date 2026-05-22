@@ -20,7 +20,7 @@ const contactLinks = [
 
 export default function Contact() {
   return (
-    <AnimatedSection id="contact" className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <AnimatedSection id="contact" className="cv-auto mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="premium-surface grid gap-8 rounded-lg p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8">
         <div>
           <p className="text-sm font-semibold text-emerald-200">Contacto</p>

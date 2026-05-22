@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
 type AnimatedSectionProps = {
@@ -16,14 +16,20 @@ export default function AnimatedSection({
   children,
   delay = 0,
 }: AnimatedSectionProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.section
       id={id}
       className={className}
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-90px" }}
-      transition={{ duration: 0.65, ease: "easeOut", delay }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{
+        duration: shouldReduceMotion ? 0.01 : 0.5,
+        ease: "easeOut",
+        delay: shouldReduceMotion ? 0 : delay,
+      }}
     >
       {children}
     </motion.section>

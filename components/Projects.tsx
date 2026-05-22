@@ -12,7 +12,7 @@ const accentClasses = [
 
 export default function Projects() {
   return (
-    <AnimatedSection id="projects" className="relative mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <AnimatedSection id="projects" className="cv-auto relative mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-emerald-200">Proyectos</p>

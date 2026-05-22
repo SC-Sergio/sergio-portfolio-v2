@@ -6,7 +6,7 @@ const icons = [TerminalSquare, Boxes, Wrench];
 
 export default function TechStack() {
   return (
-    <AnimatedSection id="tech" className="tech-frame border-y border-cyan-200/[0.10] bg-white/[0.018] px-4 py-20 sm:px-6 lg:px-8">
+    <AnimatedSection id="tech" className="cv-auto tech-frame border-y border-cyan-200/[0.10] bg-white/[0.018] px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-6xl">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-cyan-200">Tecnologías</p>

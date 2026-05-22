@@ -1,8 +1,8 @@
 "use client";
 
-import { Float, MeshDistortMaterial, OrbitControls } from "@react-three/drei";
+import { Float, MeshDistortMaterial } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { Group } from "three";
 
 const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
@@ -64,7 +64,7 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
             emissiveIntensity={0.5}
             metalness={0.58}
             roughness={0.22}
-            speed={1.35}
+            speed={reducedMotion ? 0 : 1}
           />
         </mesh>
 
@@ -108,30 +108,48 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 export default function Scene3D() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
   const reducedMotion = useSyncExternalStore(
     subscribeToReducedMotion,
     getReducedMotionSnapshot,
     getServerReducedMotionSnapshot,
   );
+  const shouldAnimate = isVisible && !reducedMotion;
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container || !("IntersectionObserver" in window)) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { rootMargin: "160px" },
+    );
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <Canvas
-      aria-hidden="true"
-      camera={{ position: [0, 0, 5.1], fov: 43 }}
-      dpr={[1, 1.25]}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-    >
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[3, 3, 5]} intensity={1.85} color="#e0f2fe" />
-      <pointLight position={[-4, -2, 3]} intensity={1.05} color="#a78bfa" />
-      <CoreShape reducedMotion={reducedMotion} />
-      <OrbitControls
-        enablePan={false}
-        enableZoom={false}
-        maxPolarAngle={Math.PI / 1.8}
-        minPolarAngle={Math.PI / 2.4}
-        rotateSpeed={0.22}
-      />
-    </Canvas>
+    <div ref={containerRef} className="h-full w-full">
+      <Canvas
+        aria-hidden="true"
+        camera={{ position: [0, 0, 5.1], fov: 43 }}
+        dpr={[1, 1.1]}
+        frameloop={shouldAnimate ? "always" : "demand"}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      >
+        <ambientLight intensity={0.75} />
+        <directionalLight position={[3, 3, 5]} intensity={1.85} color="#e0f2fe" />
+        <pointLight position={[-4, -2, 3]} intensity={1.05} color="#a78bfa" />
+        <CoreShape reducedMotion={!shouldAnimate} />
+      </Canvas>
+    </div>
   );
 }

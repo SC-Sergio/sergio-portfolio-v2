@@ -4,7 +4,7 @@ import { services } from "@/data/skills";
 
 export default function Services() {
   return (
-    <AnimatedSection id="services" className="tech-frame border-y border-cyan-200/[0.10] bg-[#06090a]/80 px-4 py-20 sm:px-6 lg:px-8">
+    <AnimatedSection id="services" className="cv-auto tech-frame border-y border-cyan-200/[0.10] bg-[#06090a]/80 px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-6xl">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-amber-200">Servicios y experiencia</p>
