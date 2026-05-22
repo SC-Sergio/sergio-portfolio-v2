@@ -21,7 +21,7 @@ const contactLinks = [
 export default function Contact() {
   return (
     <AnimatedSection id="contact" className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="grid gap-8 rounded-lg border border-white/10 bg-white/[0.06] p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8">
+      <div className="premium-surface grid gap-8 rounded-lg p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8">
         <div>
           <p className="text-sm font-semibold text-emerald-200">Contacto</p>
           <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
@@ -32,7 +32,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="flex flex-col justify-between gap-6 rounded-lg border border-white/10 bg-[#050607]/[0.72] p-5">
+        <div className="flex flex-col justify-between gap-6 border-t border-white/10 pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Mail size={20} className="mt-1 text-cyan-200" aria-hidden="true" />
@@ -69,7 +69,7 @@ export default function Contact() {
                   aria-label={link.ariaLabel}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex h-10 items-center gap-2 rounded-md border border-white/10 px-3 text-sm font-medium text-zinc-200 transition-colors hover:border-emerald-300/40 hover:bg-white/[0.08] hover:text-white"
+                  className="tech-chip inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium text-zinc-200 transition-colors hover:border-cyan-200/40 hover:bg-white/[0.08] hover:text-white"
                 >
                   <Icon size={16} aria-hidden="true" />
                   {link.label}
@@ -81,7 +81,7 @@ export default function Contact() {
           <a
             href={mailHref}
             aria-label={`Enviar correo a ${email}`}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
+            className="glow-button inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
           >
             Enviar correo
             <ArrowUpRight size={17} aria-hidden="true" />

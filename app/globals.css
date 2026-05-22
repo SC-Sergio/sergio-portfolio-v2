@@ -4,6 +4,13 @@
   --background: #050607;
   --foreground: #f4f7f5;
   --muted: #9ca3af;
+  --panel: rgba(10, 16, 18, 0.72);
+  --panel-strong: rgba(7, 11, 14, 0.88);
+  --line: rgba(255, 255, 255, 0.11);
+  --line-bright: rgba(125, 211, 252, 0.28);
+  --glow-emerald: rgba(52, 211, 153, 0.2);
+  --glow-cyan: rgba(34, 211, 238, 0.18);
+  --glow-violet: rgba(139, 92, 246, 0.14);
   --font-sans-local: "Segoe UI", Arial, Helvetica, sans-serif;
   --font-mono-local: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
@@ -28,11 +35,15 @@ html {
 body {
   min-height: 100svh;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(180deg, #050607 0%, #070908 45%, #050607 100%);
-  background-size: 72px 72px, 72px 72px, auto;
+    radial-gradient(circle at 18% -8%, rgba(45, 212, 191, 0.18), transparent 30rem),
+    radial-gradient(circle at 86% 2%, rgba(139, 92, 246, 0.14), transparent 32rem),
+    radial-gradient(circle at 62% 46%, rgba(16, 185, 129, 0.06), transparent 42rem),
+    linear-gradient(rgba(125, 211, 252, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.035) 1px, transparent 1px),
+    linear-gradient(180deg, #050607 0%, #070b0c 44%, #050607 100%);
+  background-size: auto, auto, auto, 68px 68px, 68px 68px, auto;
   color: var(--foreground);
+  text-rendering: geometricPrecision;
 }
 
 ::selection {
@@ -50,6 +61,93 @@ a {
   outline-offset: 3px;
 }
 
+.tech-frame {
+  position: relative;
+}
+
+.tech-frame::before {
+  background:
+    linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.4), transparent),
+    linear-gradient(180deg, rgba(110, 231, 183, 0.18), transparent);
+  content: "";
+  height: 1px;
+  inset: 0 0 auto;
+  opacity: 0.55;
+  position: absolute;
+}
+
+.premium-surface {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
+    var(--panel);
+  border: 1px solid var(--line);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 70px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(18px);
+}
+
+.premium-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+    var(--panel);
+  border: 1px solid var(--line);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 18px 54px rgba(0, 0, 0, 0.2);
+  isolation: isolate;
+  position: relative;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.premium-card::after {
+  background: linear-gradient(135deg, rgba(103, 232, 249, 0.26), transparent 38%, rgba(167, 139, 250, 0.2));
+  border-radius: inherit;
+  content: "";
+  inset: -1px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity 180ms ease;
+  z-index: -1;
+}
+
+.premium-card:hover {
+  border-color: var(--line-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 22px 64px rgba(0, 0, 0, 0.26),
+    0 0 38px rgba(34, 211, 238, 0.08);
+  transform: translateY(-2px);
+}
+
+.premium-card:hover::after {
+  opacity: 1;
+}
+
+.tech-chip {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.glow-button {
+  box-shadow:
+    0 0 0 1px rgba(110, 231, 183, 0.2),
+    0 18px 44px rgba(52, 211, 153, 0.22);
+}
+
+.holographic-text {
+  background: linear-gradient(90deg, #f8fafc 0%, #d1fae5 34%, #a5f3fc 68%, #ddd6fe 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -62,5 +160,9 @@ a {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .premium-card:hover {
+    transform: none;
   }
 }

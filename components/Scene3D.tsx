@@ -26,10 +26,10 @@ function CoreShape() {
         <mesh>
           <icosahedronGeometry args={[1.18, 3]} />
           <MeshDistortMaterial
-            color="#22c55e"
+            color="#10b981"
             distort={0.16}
-            emissive="#0f3d2e"
-            emissiveIntensity={0.45}
+            emissive="#073f3f"
+            emissiveIntensity={0.5}
             metalness={0.58}
             roughness={0.22}
             speed={1.35}
@@ -38,13 +38,13 @@ function CoreShape() {
       </Float>
 
       <mesh rotation={[0.55, 0.25, 0.18]} scale={1.42}>
-        <torusGeometry args={[1.08, 0.012, 12, 96]} />
+        <torusGeometry args={[1.08, 0.012, 12, 72]} />
         <meshStandardMaterial color="#67e8f9" emissive="#075985" emissiveIntensity={0.6} />
       </mesh>
 
       <mesh rotation={[-0.52, 0.42, -0.18]} scale={1.66}>
-        <torusGeometry args={[1.08, 0.01, 12, 96]} />
-        <meshStandardMaterial color="#fbbf24" emissive="#78350f" emissiveIntensity={0.42} />
+        <torusGeometry args={[1.08, 0.01, 12, 72]} />
+        <meshStandardMaterial color="#c4b5fd" emissive="#4c1d95" emissiveIntensity={0.38} />
       </mesh>
     </group>
   );
@@ -55,12 +55,12 @@ export default function Scene3D() {
     <Canvas
       aria-hidden="true"
       camera={{ position: [0, 0, 5.1], fov: 43 }}
-      dpr={[1, 1.35]}
+      dpr={[1, 1.25]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
     >
       <ambientLight intensity={0.75} />
       <directionalLight position={[3, 3, 5]} intensity={1.85} color="#e0f2fe" />
-      <pointLight position={[-4, -2, 3]} intensity={1.1} color="#fbbf24" />
+      <pointLight position={[-4, -2, 3]} intensity={1.05} color="#a78bfa" />
       <CoreShape />
       <OrbitControls
         enablePan={false}

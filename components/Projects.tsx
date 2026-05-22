@@ -12,7 +12,7 @@ const accentClasses = [
 
 export default function Projects() {
   return (
-    <AnimatedSection id="projects" className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <AnimatedSection id="projects" className="relative mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-emerald-200">Proyectos</p>
@@ -33,26 +33,26 @@ export default function Projects() {
           return (
             <article
               key={project.name}
-              className="group rounded-lg border border-white/10 bg-white/[0.06] p-5 transition-colors hover:border-emerald-200/[0.35] hover:bg-white/[0.08]"
+              className="premium-card group rounded-lg p-5"
             >
               <div className="flex items-start justify-between gap-4">
-                <span className={`grid size-11 place-items-center rounded-md ${accent}`}>
+                <span className={`grid size-11 place-items-center rounded-md border border-white/10 shadow-[0_0_28px_rgba(34,211,238,0.06)] ${accent}`}>
                   <Icon size={22} aria-hidden="true" />
                 </span>
-                <span className="rounded-md border border-white/10 px-3 py-1 text-xs font-medium text-zinc-300">
+                <span className="tech-chip rounded-md px-3 py-1 font-mono text-xs font-medium text-zinc-300">
                   {project.focus}
                 </span>
               </div>
 
               <h3 className="mt-5 text-2xl font-semibold text-white">{project.name}</h3>
               <p className="mt-3 text-sm leading-7 text-zinc-300">{project.summary}</p>
-              <p className="mt-4 border-l-2 border-emerald-300/[0.55] pl-4 text-sm leading-7 text-zinc-200">
+              <p className="mt-4 border-l-2 border-cyan-200/[0.45] pl-4 text-sm leading-7 text-zinc-200">
                 {project.result}
               </p>
 
               <div className="mt-5 flex flex-wrap gap-2">
                 {project.stack.map((item) => (
-                  <span key={item} className="rounded-md bg-black/[0.24] px-2.5 py-1 text-xs text-zinc-300">
+                  <span key={item} className="tech-chip rounded-md px-2.5 py-1 text-xs text-zinc-300">
                     {item}
                   </span>
                 ))}

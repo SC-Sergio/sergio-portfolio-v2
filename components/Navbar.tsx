@@ -23,13 +23,13 @@ const socialLinks = [
 
 export default function Navbar() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#050607]/[0.82] backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-cyan-200/[0.12] bg-[#050607]/[0.76] shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
       <nav
         aria-label="Navegación principal"
         className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8"
       >
-        <a href="#home" className="flex items-center gap-3 text-sm font-semibold text-white">
-          <span className="grid size-9 place-items-center rounded-md border border-emerald-300/[0.35] bg-emerald-300/10 text-emerald-200">
+        <a href="#home" className="group flex items-center gap-3 text-sm font-semibold text-white">
+          <span className="grid size-9 place-items-center rounded-md border border-emerald-300/[0.35] bg-emerald-300/10 text-emerald-200 shadow-[0_0_24px_rgba(52,211,153,0.12)] transition-colors group-hover:border-cyan-200/40 group-hover:text-cyan-100">
             <Code2 size={18} aria-hidden="true" />
           </span>
           <span>Sergio Carey</span>
@@ -59,7 +59,7 @@ export default function Navbar() {
                   aria-label={link.label}
                   target="_blank"
                   rel="noreferrer"
-                  className="grid size-9 place-items-center rounded-md border border-white/10 text-zinc-300 transition-colors hover:border-emerald-300/40 hover:bg-white/[0.08] hover:text-white"
+                  className="grid size-9 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-zinc-300 transition-colors hover:border-cyan-200/40 hover:bg-cyan-200/[0.08] hover:text-white"
                 >
                   <Icon size={17} aria-hidden="true" />
                 </a>
@@ -69,7 +69,7 @@ export default function Navbar() {
 
           <a
             href="#contact"
-            className="inline-flex items-center justify-center rounded-md border border-emerald-300/40 px-3 py-2 text-sm font-medium text-emerald-100 transition-colors hover:bg-emerald-300/[0.12]"
+            className="inline-flex items-center justify-center rounded-md border border-emerald-300/40 bg-emerald-300/[0.06] px-3 py-2 text-sm font-medium text-emerald-100 transition-colors hover:bg-emerald-300/[0.12]"
           >
             Hablemos
           </a>

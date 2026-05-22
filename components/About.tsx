@@ -45,8 +45,8 @@ export default function About() {
           const Icon = principle.icon;
 
           return (
-            <article key={principle.title} className="rounded-lg border border-white/10 bg-white/[0.06] p-5">
-              <Icon size={22} className="text-amber-300" aria-hidden="true" />
+            <article key={principle.title} className="premium-card rounded-lg p-5">
+              <Icon size={22} className="text-cyan-200" aria-hidden="true" />
               <h3 className="mt-4 text-lg font-semibold text-white">{principle.title}</h3>
               <p className="mt-3 text-sm leading-7 text-zinc-300">{principle.text}</p>
             </article>
