@@ -12,11 +12,13 @@ const socialLinks = [
   {
     href: "https://github.com/SC-Sergio",
     label: "GitHub de Sergio Carey",
+    shortLabel: "GitHub",
     icon: ArrowUpRight,
   },
   {
     href: "https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/",
     label: "LinkedIn de Sergio Carey",
+    shortLabel: "LinkedIn",
     icon: ArrowUpRight,
   },
 ];
@@ -57,11 +59,13 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   aria-label={link.label}
+                  title={link.shortLabel}
                   target="_blank"
                   rel="noreferrer"
-                  className="grid size-9 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-zinc-300 transition-colors hover:border-cyan-200/40 hover:bg-cyan-200/[0.08] hover:text-white"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 text-sm font-medium text-zinc-300 transition-colors hover:border-cyan-200/40 hover:bg-cyan-200/[0.08] hover:text-white"
                 >
                   <Icon size={17} aria-hidden="true" />
+                  <span>{link.shortLabel}</span>
                 </a>
               );
             })}
