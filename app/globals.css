@@ -146,6 +146,9 @@ a {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  display: inline-block;
+  overflow: visible;
+  padding-bottom: 0.06em;
 }
 
 @media (prefers-reduced-motion: reduce) {

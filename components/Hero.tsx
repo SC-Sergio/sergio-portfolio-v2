@@ -43,9 +43,12 @@ export default function Hero() {
             Portafolio de desarrollo, IA y automatización
           </div>
 
-          <h1 className="holographic-text max-w-4xl text-5xl font-semibold leading-[1.03] sm:text-6xl lg:text-7xl">
+          <h1 className="holographic-text inline-block max-w-4xl pb-2 text-5xl font-semibold leading-[1.12] sm:text-6xl lg:text-7xl">
             Sergio Carey
           </h1>
+          <p className="mt-1 font-mono text-xs uppercase tracking-[0.22em] text-cyan-100/70 sm:text-sm">
+            Sergio Enrique Carey Alegre · Inacap · Arica, Chile
+          </p>
           <p className="mt-5 max-w-2xl text-xl font-medium text-emerald-50 sm:text-2xl">
             Ingeniero Informático enfocado en Python, Django, Inteligencia Artificial y soluciones web para operaciones reales.
           </p>

@@ -9,6 +9,18 @@ export type Service = {
   points: string[];
 };
 
+export type ProfileCredential = {
+  label: string;
+  value: string;
+};
+
+export const profileCredentials: ProfileCredential[] = [
+  { label: "Nombre profesional", value: "Sergio Enrique Carey Alegre" },
+  { label: "Formación", value: "Ingeniería Informática · Inacap" },
+  { label: "Ubicación", value: "Arica, Chile" },
+  { label: "Especialidad", value: "Python, Django, IA y automatización" },
+];
+
 export const skillGroups: SkillGroup[] = [
   {
     title: "Backend y Web",

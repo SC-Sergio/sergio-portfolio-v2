@@ -1,5 +1,6 @@
 import { BrainCircuit, ShieldCheck, Workflow } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
+import { profileCredentials } from "@/data/skills";
 
 const principles = [
   {
@@ -32,12 +33,34 @@ export default function About() {
 
         <div className="space-y-6 text-base leading-8 text-zinc-300">
           <p>
-            Soy Sergio Carey, Ingeniero Informático. Trabajo principalmente con Python y Django, combinando desarrollo web, automatización, chatbots, IA aplicada y soporte técnico.
+            Soy Sergio Enrique Carey Alegre, Ingeniero Informático formado en Inacap. Trabajo principalmente con Python y Django, combinando desarrollo web, automatización, chatbots, IA aplicada y soporte técnico.
           </p>
           <p>
             Mi enfoque está en construir herramientas que ayuden a operar mejor: sistemas internos, flujos de atención, ecommerce simples, integraciones y asistentes que reduzcan trabajo manual.
           </p>
         </div>
+      </div>
+
+      <div className="premium-surface mt-12 rounded-lg p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-cyan-200">Perfil profesional</p>
+            <h3 className="mt-2 text-2xl font-semibold text-white">Credenciales y foco técnico</h3>
+          </div>
+          <p className="max-w-sm text-sm leading-6 text-zinc-400">
+            Una base práctica para construir sistemas web, automatizaciones y asistentes con criterio operativo.
+          </p>
+        </div>
+        <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {profileCredentials.map((credential) => (
+            <div key={credential.label} className="tech-chip rounded-lg p-4">
+              <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+                {credential.label}
+              </dt>
+              <dd className="mt-2 text-sm font-medium leading-6 text-zinc-100">{credential.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
       <div className="mt-12 grid gap-4 md:grid-cols-3">

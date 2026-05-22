@@ -30,6 +30,16 @@ export default function Contact() {
           <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
             Puedo ayudarte a definir alcance, priorizar una primera versión y convertir una operación manual en una herramienta digital estable.
           </p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="tech-chip rounded-lg p-4">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Contacto profesional</p>
+              <p className="mt-2 text-sm font-medium text-zinc-100">Sergio Enrique Carey Alegre</p>
+            </div>
+            <div className="tech-chip rounded-lg p-4">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Base</p>
+              <p className="mt-2 text-sm font-medium text-zinc-100">Arica, Chile · Inacap</p>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col justify-between gap-6 border-t border-white/10 pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
