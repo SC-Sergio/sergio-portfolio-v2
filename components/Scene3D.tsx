@@ -1,8 +1,9 @@
 "use client";
 
-import { Float, MeshDistortMaterial } from "@react-three/drei";
+import { Float } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { BufferGeometry, Float32BufferAttribute } from "three";
 import type { Group } from "three";
 
 const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
@@ -22,21 +23,60 @@ function getServerReducedMotionSnapshot() {
   return false;
 }
 
-const techNodes: Array<{ position: [number, number, number]; color: string }> = [
-  { position: [0.72, 0.5, 0.52], color: "#67e8f9" },
-  { position: [-0.64, 0.42, 0.36], color: "#a7f3d0" },
-  { position: [0.5, -0.68, 0.48], color: "#c4b5fd" },
-  { position: [-0.38, -0.55, 0.62], color: "#67e8f9" },
-  { position: [0.12, 0.82, -0.4], color: "#a7f3d0" },
-  { position: [-0.78, -0.06, -0.3], color: "#c4b5fd" },
-  { position: [0.84, -0.08, -0.26], color: "#67e8f9" },
-  { position: [-0.08, -0.86, -0.34], color: "#a7f3d0" },
+const neuralNodes: Array<{ position: [number, number, number]; color: string; size: number }> = [
+  { position: [0, 0, 0], color: "#e0f2fe", size: 0.08 },
+  { position: [0.72, 0.46, 0.42], color: "#67e8f9", size: 0.046 },
+  { position: [-0.7, 0.38, 0.34], color: "#a7f3d0", size: 0.044 },
+  { position: [0.56, -0.66, 0.48], color: "#c4b5fd", size: 0.042 },
+  { position: [-0.46, -0.58, 0.5], color: "#67e8f9", size: 0.04 },
+  { position: [0.18, 0.84, -0.36], color: "#a7f3d0", size: 0.04 },
+  { position: [-0.86, -0.04, -0.28], color: "#c4b5fd", size: 0.04 },
+  { position: [0.88, -0.1, -0.22], color: "#67e8f9", size: 0.04 },
+  { position: [-0.08, -0.9, -0.3], color: "#a7f3d0", size: 0.038 },
+  { position: [0.42, 0.08, 0.82], color: "#c4b5fd", size: 0.036 },
+  { position: [-0.3, 0.16, -0.78], color: "#67e8f9", size: 0.036 },
+  { position: [0.22, -0.28, -0.72], color: "#a7f3d0", size: 0.034 },
+];
+
+const neuralConnections: Array<[number, number]> = [
+  [0, 1],
+  [0, 2],
+  [0, 3],
+  [0, 4],
+  [0, 5],
+  [0, 6],
+  [0, 7],
+  [1, 5],
+  [1, 7],
+  [1, 9],
+  [2, 5],
+  [2, 6],
+  [3, 7],
+  [3, 8],
+  [4, 6],
+  [4, 8],
+  [5, 10],
+  [6, 10],
+  [7, 11],
+  [8, 11],
 ];
 
 function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
   const groupRef = useRef<Group>(null);
+  const pulseRef = useRef<Group>(null);
   const { viewport } = useThree();
   const scale = Math.min(Math.max(viewport.width / 7, 0.72), 1.18);
+  const connectionGeometry = useMemo(() => {
+    const positions = neuralConnections.flatMap(([startIndex, endIndex]) => [
+      ...neuralNodes[startIndex].position,
+      ...neuralNodes[endIndex].position,
+    ]);
+    const geometry = new BufferGeometry();
+
+    geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
+
+    return geometry;
+  }, []);
 
   useFrame((state) => {
     if (!groupRef.current || reducedMotion) {
@@ -44,64 +84,78 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
     }
 
     const elapsed = state.clock.getElapsedTime();
-    groupRef.current.rotation.y = elapsed * 0.16;
-    groupRef.current.rotation.x = Math.sin(elapsed * 0.28) * 0.08;
+    groupRef.current.rotation.y = elapsed * 0.1;
+    groupRef.current.rotation.x = Math.sin(elapsed * 0.2) * 0.055;
+    groupRef.current.rotation.z = Math.sin(elapsed * 0.14) * 0.025;
+
+    if (pulseRef.current) {
+      const pulse = 1 + Math.sin(elapsed * 1.35) * 0.025;
+      pulseRef.current.scale.setScalar(pulse);
+    }
   });
 
   return (
     <group ref={groupRef} scale={scale} position={[1.1, -0.05, 0]}>
       <Float
-        speed={reducedMotion ? 0 : 1.25}
-        rotationIntensity={reducedMotion ? 0 : 0.32}
-        floatIntensity={reducedMotion ? 0 : 0.48}
+        speed={reducedMotion ? 0 : 0.85}
+        rotationIntensity={reducedMotion ? 0 : 0.16}
+        floatIntensity={reducedMotion ? 0 : 0.28}
       >
-        <mesh>
-          <icosahedronGeometry args={[1.18, 3]} />
-          <MeshDistortMaterial
-            color="#10b981"
-            distort={0.16}
-            emissive="#073f3f"
-            emissiveIntensity={0.5}
-            metalness={0.58}
-            roughness={0.22}
-            speed={reducedMotion ? 0 : 1}
-          />
-        </mesh>
+        <lineSegments geometry={connectionGeometry}>
+          <lineBasicMaterial color="#67e8f9" transparent opacity={0.34} />
+        </lineSegments>
 
-        <mesh scale={0.42}>
-          <icosahedronGeometry args={[0.92, 1]} />
-          <meshStandardMaterial
-            color="#e0f2fe"
-            emissive="#22d3ee"
-            emissiveIntensity={0.72}
-            metalness={0.35}
-            roughness={0.28}
-            transparent
-            opacity={0.46}
-          />
-        </mesh>
+        <group ref={pulseRef}>
+          <mesh scale={0.68}>
+            <icosahedronGeometry args={[0.42, 1]} />
+            <meshStandardMaterial
+              color="#e0f2fe"
+              emissive="#22d3ee"
+              emissiveIntensity={0.9}
+              metalness={0.45}
+              roughness={0.26}
+              transparent
+              opacity={0.84}
+            />
+          </mesh>
+          <mesh scale={0.92}>
+            <icosahedronGeometry args={[0.42, 0]} />
+            <meshStandardMaterial
+              color="#a7f3d0"
+              emissive="#064e3b"
+              emissiveIntensity={0.48}
+              metalness={0.35}
+              roughness={0.36}
+              transparent
+              opacity={0.32}
+              wireframe
+            />
+          </mesh>
+        </group>
 
-        <mesh rotation={[0.4, -0.2, 0.72]} scale={0.82}>
-          <torusGeometry args={[0.72, 0.006, 8, 48]} />
-          <meshStandardMaterial color="#a7f3d0" emissive="#064e3b" emissiveIntensity={0.58} />
-        </mesh>
-
-        {techNodes.map((node) => (
+        {neuralNodes.slice(1).map((node) => (
           <mesh key={node.position.join(":")} position={node.position}>
-            <sphereGeometry args={[0.04, 8, 8]} />
-            <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={0.85} />
+            <sphereGeometry args={[node.size, 10, 10]} />
+            <meshStandardMaterial
+              color={node.color}
+              emissive={node.color}
+              emissiveIntensity={0.9}
+              roughness={0.32}
+              transparent
+              opacity={0.88}
+            />
           </mesh>
         ))}
       </Float>
 
-      <mesh rotation={[0.55, 0.25, 0.18]} scale={1.42}>
-        <torusGeometry args={[1.08, 0.012, 12, 72]} />
-        <meshStandardMaterial color="#67e8f9" emissive="#075985" emissiveIntensity={0.6} />
+      <mesh rotation={[0.5, 0.24, 0.16]} scale={1.28}>
+        <torusGeometry args={[1.05, 0.006, 8, 64]} />
+        <meshStandardMaterial color="#67e8f9" emissive="#075985" emissiveIntensity={0.46} transparent opacity={0.58} />
       </mesh>
 
-      <mesh rotation={[-0.52, 0.42, -0.18]} scale={1.66}>
-        <torusGeometry args={[1.08, 0.01, 12, 72]} />
-        <meshStandardMaterial color="#c4b5fd" emissive="#4c1d95" emissiveIntensity={0.38} />
+      <mesh rotation={[-0.46, 0.4, -0.2]} scale={1.48}>
+        <torusGeometry args={[1.03, 0.005, 8, 72]} />
+        <meshStandardMaterial color="#c4b5fd" emissive="#4c1d95" emissiveIntensity={0.34} transparent opacity={0.42} />
       </mesh>
     </group>
   );
