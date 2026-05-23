@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sergio Carey Portfolio
 
-## Getting Started
+Portafolio personal de **Sergio Enrique Carey Alegre**, Ingeniero Informático enfocado en Python, Django, Inteligencia Artificial, automatización, chatbots, APIs, desarrollo web y soporte técnico.
 
-First, run the development server:
+El sitio presenta una identidad visual futurista profesional, un Hero con experiencia 3D liviana, secciones de perfil, tecnologías, proyectos destacados, servicios y contacto.
+
+## Stack
+
+- Next.js con App Router
+- TypeScript
+- Tailwind CSS
+- Motion
+- Lucide React
+- React Three Fiber, Drei y Three.js
+
+## Características principales
+
+- Diseño responsive para desktop, pantallas anchas y móvil.
+- Hero premium con visual 3D optimizado.
+- Secciones profesionales para perfil, tecnologías, proyectos y servicios.
+- Contacto real con correo, GitHub y LinkedIn.
+- SEO básico, Open Graph, Twitter metadata, sitemap y robots.
+- Accesibilidad cuidada con contraste, foco visible y enlaces claros.
+
+## Estructura general
+
+```text
+app/
+  layout.tsx
+  page.tsx
+  globals.css
+  sitemap.ts
+  robots.ts
+  opengraph-image.tsx
+  twitter-image.tsx
+components/
+  Hero.tsx
+  Scene3D.tsx
+  About.tsx
+  TechStack.tsx
+  Projects.tsx
+  Services.tsx
+  Contact.tsx
+  Navbar.tsx
+  Footer.tsx
+data/
+  projects.ts
+  skills.ts
+```
+
+## Comandos
+
+Instalar dependencias:
+
+```bash
+npm install
+```
+
+Levantar entorno de desarrollo:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Crear build de producción:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Ejecutar build local:
 
-## Learn More
+```bash
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy en Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+El proyecto está preparado para desplegarse en Vercel como aplicación Next.js.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Al publicar, configura la variable de entorno:
 
-## Deploy on Vercel
+```bash
+NEXT_PUBLIC_SITE_URL=https://tu-dominio-o-url-de-vercel
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Esa URL se usa para metadata, canonical, sitemap y robots. Si no existe, el proyecto usa `http://localhost:3000` como fallback local.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Autor
+
+**Sergio Enrique Carey Alegre**  
+Ingeniero Informático
+
+- Correo: [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com)
+- GitHub: [SC-Sergio](https://github.com/SC-Sergio)
+- LinkedIn: [Sergio Enrique Carey Alegre](https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/)
