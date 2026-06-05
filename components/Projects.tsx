@@ -51,11 +51,29 @@ export default function Projects() {
 
               <h3 className="mt-5 text-2xl font-semibold text-white">{project.name}</h3>
               <p className="mt-3 text-sm leading-7 text-zinc-300">{project.summary}</p>
-              <div className="mt-5 grid gap-3 2xl:grid-cols-3">
+              <div className="mt-5 grid gap-3 2xl:grid-cols-2">
                 <div className="border-l-2 border-violet-200/[0.35] pl-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Problema</p>
                   <p className="mt-2 text-sm leading-7 text-zinc-300">{project.problem}</p>
                 </div>
+                <div className="border-l-2 border-cyan-200/[0.45] pl-4">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Solución</p>
+                  <p className="mt-2 text-sm leading-7 text-zinc-200">{project.solution}</p>
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Stack</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {project.stack.map((item) => (
+                    <span key={item} className="tech-chip rounded-md px-2.5 py-1 text-xs text-zinc-300">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 2xl:grid-cols-2">
                 <div className="border-l-2 border-cyan-200/[0.45] pl-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Resultado</p>
                   <p className="mt-2 text-sm leading-7 text-zinc-200">{project.result}</p>
@@ -64,14 +82,6 @@ export default function Projects() {
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Impacto</p>
                   <p className="mt-2 text-sm leading-7 text-zinc-300">{project.impact}</p>
                 </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {project.stack.map((item) => (
-                  <span key={item} className="tech-chip rounded-md px-2.5 py-1 text-xs text-zinc-300">
-                    {item}
-                  </span>
-                ))}
               </div>
             </article>
           );

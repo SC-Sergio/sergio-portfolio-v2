@@ -2,6 +2,7 @@ export type Project = {
   name: string;
   summary: string;
   problem: string;
+  solution: string;
   result: string;
   impact: string;
   stack: string[];
@@ -22,6 +23,8 @@ export const projects: Project[] = [
       "Sistema Django para gestión operativa de lavandería, caja, pedidos, guías, pagos, trazabilidad y flujos internos.",
     problem:
       "Operaciones diarias con múltiples estados, pagos y decisiones internas que necesitan orden y trazabilidad.",
+    solution:
+      "Construir un sistema interno en Django que ordena pedidos, caja, guías, pagos y trazabilidad en pantallas operativas.",
     result:
       "Digitaliza operaciones con foco en control de caja, auditoría y continuidad del servicio.",
     impact:
@@ -36,6 +39,8 @@ export const projects: Project[] = [
       "Chatbot para atención automatizada usando Flask, Twilio y OpenAI.",
     problem:
       "Atención inicial repetitiva que requiere capturar contexto y responder de forma consistente.",
+    solution:
+      "Implementar un asistente conversacional con Flask, Twilio y OpenAI para estructurar mensajes, contexto inicial y derivación humana.",
     result:
       "Centraliza respuestas, captura información clave y reduce fricción en la primera atención.",
     impact:
@@ -50,6 +55,8 @@ export const projects: Project[] = [
       "Asistente automatizado de práctica para examen de conducción, con preguntas, gamificación y pagos.",
     problem:
       "Práctica dispersa y poco guiada para usuarios que necesitan estudiar de forma constante.",
+    solution:
+      "Crear una experiencia de práctica guiada con bot, preguntas, dinámica de avance, gamificación y flujo de pagos.",
     result:
       "Convierte el estudio en una experiencia guiada, medible y disponible bajo demanda.",
     impact:
@@ -64,6 +71,8 @@ export const projects: Project[] = [
       "Ecommerce Django para venta de ropa, con flujo de compra por transferencia y contacto vía WhatsApp.",
     problem:
       "Venta online que requiere vitrina clara, compra simple y contacto directo sin sobrecargar la operación.",
+    solution:
+      "Desarrollar una vitrina ecommerce Django con catálogo, compra por transferencia y contacto vía WhatsApp.",
     result:
       "Entrega una vitrina boutique con proceso de compra simple, administrable y orientado a conversión.",
     impact:

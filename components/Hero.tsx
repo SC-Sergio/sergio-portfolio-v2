@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUpRight, Cpu, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Cpu, Download, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import dynamic from "next/dynamic";
 
@@ -81,6 +81,15 @@ export default function Hero() {
             >
               Iniciar conversación
               <ArrowUpRight size={17} aria-hidden="true" />
+            </a>
+            <a
+              href="/sergio-carey-cv.pdf"
+              download
+              aria-label="Descargar CV de Sergio Carey en PDF"
+              className="premium-surface inline-flex h-12 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold text-white transition-colors hover:border-emerald-200/35 hover:bg-white/[0.09]"
+            >
+              Descargar CV
+              <Download size={17} aria-hidden="true" />
             </a>
           </div>
 

@@ -63,6 +63,11 @@ const linkTokens = [
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/",
   },
+  {
+    token: "https://sergio-portfolio-v2-roan.vercel.app",
+    label: "Portafolio publicado",
+    href: "https://sergio-portfolio-v2-roan.vercel.app",
+  },
 ];
 
 function isStoredLimitState(value: unknown): value is LimitState {

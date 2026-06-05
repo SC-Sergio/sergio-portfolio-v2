@@ -15,6 +15,7 @@ export const assistantQuickPrompts = [
   "¿Qué proyectos ha desarrollado?",
   "¿Qué tecnologías domina?",
   "Explícame FASTLAUNDRY",
+  "¿Dónde puedo ver el portafolio publicado?",
   "¿Cómo puedo contactarlo?",
 ] as const;
 
@@ -34,6 +35,8 @@ export type AssistantReply = {
 
 const contactText =
   "Puedes contactar a Sergio por correo en [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com). También está en GitHub: https://github.com/SC-Sergio y LinkedIn: https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/.";
+
+const publicPortfolioUrl = "https://sergio-portfolio-v2-roan.vercel.app";
 
 const normalize = (value: string) =>
   value
@@ -133,6 +136,10 @@ const portfolioTerms = [
   "asistente",
   "bot",
   "portafolio",
+  "publicado",
+  "url publica",
+  "url pública",
+  "vercel",
 ];
 
 export function getPortfolioAssistantReply(question: string): AssistantReply {
@@ -151,6 +158,22 @@ export function getPortfolioAssistantReply(question: string): AssistantReply {
 
   if (!includesAny(text, portfolioTerms)) {
     return { text: outOfScopeMessage, status: "out-of-scope" };
+  }
+
+  if (
+    includesAny(text, [
+      "portafolio publicado",
+      "url publica",
+      "url pública",
+      "sitio publicado",
+      "ver el portafolio",
+      "vercel",
+    ])
+  ) {
+    return {
+      text: `Puedes ver el portafolio publicado en ${publicPortfolioUrl}`,
+      status: "answer",
+    };
   }
 
   if (includesAny(text, ["fastlaundry", "lavanderia", "caja", "trazabilidad"])) {

@@ -1,4 +1,4 @@
-import { ArrowUpRight, Mail, MessageSquareText } from "lucide-react";
+import { ArrowUpRight, Download, Mail, MessageSquareText } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 
 const email = "sergiocareyhola@gmail.com";
@@ -25,10 +25,10 @@ export default function Contact() {
         <div className="max-w-3xl">
           <p className="text-sm font-semibold text-emerald-200">Contacto</p>
           <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-            Conversemos sobre el sistema, bot o automatización que quieres construir.
+            Hablemos de una oportunidad, sistema o automatización con alcance claro.
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
-            Puedo ayudarte a definir alcance, priorizar una primera versión y convertir una operación manual en una herramienta digital estable.
+            Comparte el contexto, objetivo y enlaces relevantes para iniciar una conversación técnica y profesional.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <div className="tech-chip rounded-lg p-4">
@@ -49,7 +49,7 @@ export default function Contact() {
               <div>
                 <h3 className="font-semibold text-white">Correo directo</h3>
                 <p className="mt-1 text-sm leading-6 text-zinc-400">
-                  Ideal para proyectos, soporte y propuestas de automatización.
+                  Para oportunidades profesionales, colaboración técnica o consultas de proyecto.
                 </p>
                 <a
                   href={mailHref}
@@ -62,8 +62,8 @@ export default function Contact() {
             <div className="flex items-start gap-3">
               <MessageSquareText size={20} className="mt-1 text-amber-200" aria-hidden="true" />
               <div>
-                <h3 className="font-semibold text-white">Primer diagnóstico</h3>
-                <p className="mt-1 text-sm leading-6 text-zinc-400">Reviso el flujo actual y propongo un camino simple para avanzar.</p>
+                <h3 className="font-semibold text-white">Contexto útil</h3>
+                <p className="mt-1 text-sm leading-6 text-zinc-400">Incluye objetivo, flujo actual y enlaces relevantes para una conversación más precisa.</p>
               </div>
             </div>
           </div>
@@ -88,14 +88,25 @@ export default function Contact() {
             })}
           </address>
 
-          <a
-            href={mailHref}
-            aria-label={`Enviar correo a ${email}`}
-            className="glow-button inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
-          >
-            Enviar correo
-            <ArrowUpRight size={17} aria-hidden="true" />
-          </a>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <a
+              href={mailHref}
+              aria-label={`Enviar correo a ${email}`}
+              className="glow-button inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
+            >
+              Enviar correo
+              <ArrowUpRight size={17} aria-hidden="true" />
+            </a>
+            <a
+              href="/sergio-carey-cv.pdf"
+              download
+              aria-label="Descargar CV de Sergio Carey en PDF"
+              className="premium-surface inline-flex h-12 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold text-white transition-colors hover:border-cyan-200/35 hover:bg-white/[0.09]"
+            >
+              Descargar CV
+              <Download size={17} aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </div>
     </AnimatedSection>

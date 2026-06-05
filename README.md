@@ -4,6 +4,8 @@ Portafolio personal de **Sergio Enrique Carey Alegre**, Ingeniero Informático e
 
 El sitio presenta una identidad visual futurista profesional, un Hero con experiencia 3D liviana, secciones de perfil, tecnologías, proyectos destacados, servicios y contacto.
 
+Sitio publicado en Vercel: [sergio-portfolio-v2-roan.vercel.app](https://sergio-portfolio-v2-roan.vercel.app)
+
 ## Stack
 
 - Next.js con App Router
@@ -81,7 +83,7 @@ El proyecto está preparado para desplegarse en Vercel como aplicación Next.js.
 Al publicar, configura la variable de entorno:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://tu-dominio-o-url-de-vercel
+NEXT_PUBLIC_SITE_URL=https://sergio-portfolio-v2-roan.vercel.app
 ```
 
 Esa URL se usa para metadata, canonical, sitemap y robots. Si no existe, el proyecto usa `http://localhost:3000` como fallback local.
