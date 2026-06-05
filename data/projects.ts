@@ -8,12 +8,17 @@ export type Project = {
   stack: string[];
   focus: string;
   status: string;
+  repositoryUrl?: string;
+  demoUrl?: string;
+  caseUrl?: string;
 };
 
 export type LabProject = {
   name: string;
   description: string;
-  href: string;
+  repositoryUrl?: string;
+  demoUrl?: string;
+  caseUrl?: string;
 };
 
 export const projects: Project[] = [
@@ -87,21 +92,22 @@ export const labProjects: LabProject[] = [
   {
     name: "CanchaClara",
     description: "Experimentos web y lógica de producto para gestión deportiva.",
-    href: "https://github.com/SC-Sergio",
+    repositoryUrl: "https://github.com/SC-Sergio/canchaclara",
   },
   {
     name: "Challenge Encriptador",
     description: "Ejercicio frontend enfocado en interacción, lógica y presentación.",
-    href: "https://github.com/SC-Sergio",
+    repositoryUrl: "https://github.com/SC-Sergio/challenge-encriptador",
+    demoUrl: "https://sc-sergio.github.io/challenge-encriptador/",
   },
   {
     name: "ProgramacionAvanzadaInacap",
     description: "Repositorio académico vinculado a formación y práctica técnica.",
-    href: "https://github.com/SC-Sergio",
+    repositoryUrl: "https://github.com/SC-Sergio/ProgramacionAvanzadaInacap",
   },
   {
     name: "ProjectQR",
     description: "Exploración de utilidades digitales y flujos basados en códigos QR.",
-    href: "https://github.com/SC-Sergio",
+    repositoryUrl: "https://github.com/SC-Sergio/ProjectQR",
   },
 ];

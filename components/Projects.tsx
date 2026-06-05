@@ -1,4 +1,14 @@
-import { ArrowUpRight, Bot, Shirt, Truck, WalletCards } from "lucide-react";
+import {
+  ArrowUpRight,
+  Bot,
+  Code2,
+  FileText,
+  MonitorPlay,
+  Shirt,
+  Truck,
+  WalletCards,
+  type LucideIcon,
+} from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { labProjects, projects } from "@/data/projects";
 
@@ -9,6 +19,79 @@ const accentClasses = [
   "text-amber-200 bg-amber-300/10",
   "text-rose-200 bg-rose-300/10",
 ];
+
+type LinkableProject = {
+  name: string;
+  repositoryUrl?: string;
+  demoUrl?: string;
+  caseUrl?: string;
+};
+
+type ProjectLink = {
+  href: string;
+  label: string;
+  ariaLabel: string;
+  Icon: LucideIcon;
+};
+
+function getProjectLinks(project: LinkableProject): ProjectLink[] {
+  const links: ProjectLink[] = [];
+
+  if (project.repositoryUrl) {
+    links.push({
+      href: project.repositoryUrl,
+      label: "Ver código",
+      ariaLabel: `Ver código de ${project.name}`,
+      Icon: Code2,
+    });
+  }
+
+  if (project.demoUrl) {
+    links.push({
+      href: project.demoUrl,
+      label: "Ver demo",
+      ariaLabel: `Ver demo de ${project.name}`,
+      Icon: MonitorPlay,
+    });
+  }
+
+  if (project.caseUrl) {
+    links.push({
+      href: project.caseUrl,
+      label: "Ver caso",
+      ariaLabel: `Ver caso de estudio de ${project.name}`,
+      Icon: FileText,
+    });
+  }
+
+  return links;
+}
+
+function ProjectLinks({ project }: { project: LinkableProject }) {
+  const links = getProjectLinks(project);
+
+  if (!links.length) {
+    return null;
+  }
+
+  return (
+    <div className="mt-5 flex flex-wrap gap-2">
+      {links.map(({ href, label, ariaLabel, Icon }) => (
+        <a
+          key={`${project.name}-${label}`}
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={ariaLabel}
+          className="tech-chip inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-zinc-200 transition-colors hover:border-cyan-200/40 hover:bg-white/[0.08] hover:text-white"
+        >
+          <Icon size={15} className="shrink-0 text-cyan-200" aria-hidden="true" />
+          <span>{label}</span>
+        </a>
+      ))}
+    </div>
+  );
+}
 
 export default function Projects() {
   return (
@@ -83,6 +166,8 @@ export default function Projects() {
                   <p className="mt-2 text-sm leading-7 text-zinc-300">{project.impact}</p>
                 </div>
               </div>
+
+              <ProjectLinks project={project} />
             </article>
           );
         })}
@@ -106,20 +191,17 @@ export default function Projects() {
         </div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           {labProjects.map((project) => (
-            <a
+            <article
               key={project.name}
-              href={project.href}
-              target="_blank"
-              rel="noreferrer"
-              className="tech-chip rounded-lg p-4 transition-colors hover:border-cyan-200/35 hover:bg-white/[0.08]"
-              aria-label={`Ver ${project.name} en GitHub`}
+              className="tech-chip flex min-w-0 flex-col rounded-lg p-4"
             >
-              <span className="flex items-center justify-between gap-3">
-                <span className="font-semibold text-white">{project.name}</span>
-                <ArrowUpRight size={15} className="text-cyan-200" aria-hidden="true" />
-              </span>
-              <span className="mt-3 block text-sm leading-6 text-zinc-400">{project.description}</span>
-            </a>
+              <div className="flex items-start justify-between gap-3">
+                <h4 className="min-w-0 break-words text-base font-semibold text-white">{project.name}</h4>
+                <ArrowUpRight size={15} className="mt-1 shrink-0 text-cyan-200" aria-hidden="true" />
+              </div>
+              <p className="mt-3 flex-1 text-sm leading-6 text-zinc-400">{project.description}</p>
+              <ProjectLinks project={project} />
+            </article>
           ))}
         </div>
       </div>
