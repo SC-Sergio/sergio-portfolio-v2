@@ -8,18 +8,18 @@ export const ASSISTANT_LIMITS = {
 export const ASSISTANT_SESSION_KEY = "sergio-portfolio-assistant-limits";
 
 export const assistantInitialMessage =
-  "Hola, soy el asistente demo del portafolio de Sergio. Puedo responder sobre sus proyectos, stack, servicios y contacto.";
+  "Hola, soy el asistente demo del portafolio de Sergio. Puedo responder sobre su perfil, proyectos, stack, servicios y contacto.";
 
 export const assistantQuickPrompts = [
   "¿Quién es Sergio Carey?",
   "¿Qué proyectos ha desarrollado?",
   "¿Qué tecnologías domina?",
-  "Explícame FASTLAUNDRY",
+  "Explícame Carey Assistant",
   "¿Cómo puedo contactarlo?",
 ] as const;
 
 export const outOfScopeMessage =
-  "Soy un asistente demo del portafolio de Sergio Carey. Puedo responder sobre sus proyectos, tecnologías, servicios y contacto. Para otro tema, puedes escribirle directamente a [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com).";
+  "Soy un asistente demo local del portafolio de Sergio Carey. Puedo responder sobre sus proyectos, tecnologías, servicios y contacto. Para otro tema, puedes escribirle directamente a [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com).";
 
 export const limitReachedMessage =
   "Llegaste al límite de 8 preguntas de esta demo local. Para continuar la conversación, puedes escribirle directamente a [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com).";
@@ -97,6 +97,21 @@ const portfolioTerms = [
   "python",
   "django",
   "flask",
+  "java",
+  "spring boot",
+  "postgresql",
+  "mysql",
+  "typescript",
+  "react",
+  "next.js",
+  "nextjs",
+  "rust",
+  "tauri",
+  "ollama",
+  "llm",
+  "rag",
+  "machine learning",
+  "data science",
   "inteligencia artificial",
   "ia",
   "automatizacion",
@@ -105,17 +120,16 @@ const portfolioTerms = [
   "api",
   "apis",
   "desarrollo web",
-  "soporte tecnico",
   "fastlaundry",
-  "tome assistant",
-  "examen clase b",
-  "bot examen",
-  "tesoro americano",
+  "carey assistant",
+  "spacex",
+  "falcon 9",
+  "literalura",
+  "forohub",
   "canchaclara",
   "challenge encriptador",
   "programacionavanzadainacap",
   "programacion avanzada",
-  "projectqr",
   "proyecto",
   "proyectos",
   "laboratorio",
@@ -155,28 +169,35 @@ export function getPortfolioAssistantReply(question: string): AssistantReply {
 
   if (includesAny(text, ["fastlaundry", "lavanderia", "caja", "trazabilidad"])) {
     return {
-      text: "FASTLAUNDRY es un sistema Django para gestión operativa de lavandería. Cubre caja, pedidos, guías, pagos, trazabilidad y flujos internos, con foco en ordenar la operación diaria y hacer más claro el seguimiento de cada pedido.",
+      text: "FASTLAUNDRY es un sistema Django de uso real para una lavandería. Gestiona clientes, pedidos, caja, pagos, guías, estados y trazabilidad operativa sobre PostgreSQL. El código es privado porque forma parte de una operación productiva.",
       status: "answer",
     };
   }
 
-  if (includesAny(text, ["tome assistant", "twilio", "flask"])) {
+  if (includesAny(text, ["carey assistant", "ollama", "tauri", "rust", "ia local"])) {
     return {
-      text: "Tome Assistant es un chatbot para atención automatizada desarrollado con Flask, Twilio y OpenAI. Refuerza el enfoque de Sergio en asistentes conversacionales, automatización y conexión entre APIs.",
+      text: "Carey Assistant es una aplicación de escritorio para Windows construida con Tauri, React, TypeScript y Rust. Integra IA local con Ollama, selección de modelos, utilidades, noticias, notificaciones y automatización. El código principal es privado y sus releases se publican en GitHub.",
       status: "answer",
     };
   }
 
-  if (includesAny(text, ["clase b", "conduccion", "examen"])) {
+  if (includesAny(text, ["spacex", "falcon 9", "falcon9", "machine learning", "data science"])) {
     return {
-      text: "Bot examen clase B Chile es un asistente de práctica para el examen de conducción. Incluye preguntas, dinámica de práctica, gamificación y flujo de pagos, orientado a estudiar de forma más guiada.",
+      text: "SpaceX Falcon 9 Landing Prediction es un proyecto de ciencia de datos con Python. Incluye análisis tabular, SQL, visualizaciones, mapas, dashboard y experimentos de clasificación con scikit-learn y TensorFlow.",
       status: "answer",
     };
   }
 
-  if (includesAny(text, ["tesoro americano", "ecommerce", "ropa", "whatsapp"])) {
+  if (includesAny(text, ["literalura", "gutendex", "spring boot", "jpa"])) {
     return {
-      text: "Tesoro Americano es un ecommerce Django para venta de ropa, con flujo de compra por transferencia y contacto vía WhatsApp. Muestra experiencia en comercio web, catálogo, compra y presentación de producto.",
+      text: "LiterAlura es una aplicación CLI con Java 17 y Spring Boot que integra Gutendex con PostgreSQL/JPA. Permite buscar y persistir libros y autores, consultar por idioma y evaluar autores vivos en un año, con pruebas y CI en GitHub Actions.",
+      status: "answer",
+    };
+  }
+
+  if (includesAny(text, ["forohub", "foro hub", "flyway"])) {
+    return {
+      text: "ChallengeForoHub es un backend educativo con Java, Spring Boot, Spring Data JPA, MySQL y Flyway. Expone operaciones reales de lectura y creación de posts y está documentado como proyecto de aprendizaje backend.",
       status: "answer",
     };
   }
@@ -187,33 +208,49 @@ export function getPortfolioAssistantReply(question: string): AssistantReply {
       "challenge encriptador",
       "programacionavanzadainacap",
       "programacion avanzada",
-      "projectqr",
       "laboratorio",
     ])
   ) {
     return {
-      text: "En laboratorio y proyectos secundarios aparecen CanchaClara, Challenge Encriptador, ProgramacionAvanzadaInacap y ProjectQR. Funcionan como muestras complementarias de práctica, lógica de producto, frontend, formación técnica y utilidades digitales.",
+      text: "En laboratorio y proyectos secundarios aparecen ChallengeForoHub, CanchaClara, Challenge Encriptador y ProgramacionAvanzadaInacap. Funcionan como muestras complementarias de backend, frontend, lógica de producto y formación técnica.",
       status: "answer",
     };
   }
 
   if (includesAny(text, ["proyecto", "proyectos", "desarrollado", "construido"])) {
     return {
-      text: "Los proyectos principales son FASTLAUNDRY, Tome Assistant, Bot examen clase B Chile y Tesoro Americano. Cubren sistemas Django, automatización, chatbots, pagos, ecommerce, APIs y flujos operativos reales.",
+      text: "Los proyectos destacados son FASTLAUNDRY, Carey Assistant, SpaceX Falcon 9 Landing Prediction y LiterAlura. En conjunto muestran sistemas reales de negocio, aplicaciones desktop con IA local, data science y backend Java/Spring Boot.",
       status: "answer",
     };
   }
 
-  if (includesAny(text, ["tecnologia", "tecnologias", "stack", "python", "django", "ia", "api", "apis"])) {
+  if (
+    includesAny(text, [
+      "tecnologia",
+      "tecnologias",
+      "stack",
+      "python",
+      "django",
+      "java",
+      "spring boot",
+      "postgresql",
+      "typescript",
+      "react",
+      "rust",
+      "ia",
+      "api",
+      "apis",
+    ])
+  ) {
     return {
-      text: "El stack principal de Sergio se centra en Python, Django, Flask, Inteligencia Artificial aplicada, automatización, chatbots, APIs, desarrollo web y soporte técnico. Su perfil combina backend, producto y operación.",
+      text: "El stack actual de Sergio combina Python/Django, Java/Spring Boot, PostgreSQL/MySQL, TypeScript/React/Next.js, Tauri/Rust, Ollama y LLMs, además de automatización, GitHub Actions, Heroku y Vercel.",
       status: "answer",
     };
   }
 
   if (includesAny(text, ["servicio", "servicios", "automatizacion", "chatbot", "soporte"])) {
     return {
-      text: "Sergio puede aportar en desarrollo web con Python/Django, automatización de procesos, chatbots, integración de APIs, soporte técnico y construcción de sistemas internos claros para operación.",
+      text: "Sergio puede aportar en sistemas web y backend operacional, automatización e IA aplicada, integraciones de APIs y desarrollo de productos web o desktop con foco en estabilidad y mantenimiento.",
       status: "answer",
     };
   }
@@ -224,20 +261,20 @@ export function getPortfolioAssistantReply(question: string): AssistantReply {
 
   if (includesAny(text, ["quien", "perfil", "sergio", "carey", "inacap", "arica"])) {
     return {
-      text: "Sergio Enrique Carey Alegre, visible profesionalmente como Sergio Carey, es Ingeniero Informático formado en Inacap y ubicado en Arica, Chile. Su foco está en Python, Django, IA, automatización, chatbots, APIs, desarrollo web y soporte técnico.",
+      text: "Sergio Enrique Carey Alegre, visible profesionalmente como Sergio Carey, es Ingeniero Informático formado en Inacap y ubicado en Arica, Chile. Su foco está en backend, IA aplicada, automatización, datos y desarrollo de productos digitales.",
       status: "answer",
     };
   }
 
   if (includesAny(text, ["asistente", "bot", "portafolio", "puedes hacer"])) {
     return {
-      text: "Soy una demo local del portafolio. Puedo orientar sobre el perfil de Sergio, sus proyectos principales, tecnologías, servicios y formas de contacto. No uso API externa ni guardo datos personales.",
+      text: "Soy una demo local del portafolio. Puedo orientar sobre el perfil de Sergio, sus proyectos principales, tecnologías, servicios y formas de contacto. No uso API externa ni guardo conversaciones en un servidor.",
       status: "answer",
     };
   }
 
   return {
-    text: "Puedo ayudarte con una vista rápida del perfil de Sergio, sus proyectos, tecnologías, servicios o contacto. Prueba preguntando por FASTLAUNDRY, su stack o cómo contactarlo.",
+    text: "Puedo ayudarte con una vista rápida del perfil de Sergio, sus proyectos, tecnologías, servicios o contacto. Prueba preguntando por Carey Assistant, FASTLAUNDRY, LiterAlura, SpaceX o su stack.",
     status: "answer",
   };
 }
