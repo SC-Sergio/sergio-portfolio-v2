@@ -1,13 +1,13 @@
-import { ArrowUpRight, Bot, Shirt, Truck, WalletCards } from "lucide-react";
+import { ArrowUpRight, Bot, BrainCircuit, Database, Truck } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { labProjects, projects } from "@/data/projects";
 
-const projectIcons = [Truck, Bot, WalletCards, Shirt];
+const projectIcons = [Truck, Bot, BrainCircuit, Database];
 const accentClasses = [
   "text-emerald-200 bg-emerald-300/10",
   "text-cyan-200 bg-cyan-300/10",
+  "text-violet-200 bg-violet-300/10",
   "text-amber-200 bg-amber-300/10",
-  "text-rose-200 bg-rose-300/10",
 ];
 
 export default function Projects() {
@@ -17,11 +17,11 @@ export default function Projects() {
         <div className="max-w-3xl xl:col-span-7">
           <p className="text-sm font-semibold text-emerald-200">Proyectos</p>
           <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-            Sistemas con foco en operación, automatización y experiencia de usuario.
+            Sistemas con foco en operación, IA aplicada, datos y experiencia de usuario.
           </h2>
         </div>
         <p className="max-w-sm text-sm leading-7 text-zinc-400 xl:col-span-4 xl:col-start-9">
-          Cada proyecto combina desarrollo técnico con decisiones de producto para que la solución sea usable en el día a día.
+          Una selección de proyectos reales y académicos que muestran backend, desktop, data science, integración de APIs y automatización.
         </p>
       </div>
 
@@ -29,6 +29,7 @@ export default function Projects() {
         {projects.map((project, index) => {
           const Icon = projectIcons[index] ?? ArrowUpRight;
           const accent = accentClasses[index] ?? accentClasses[0];
+          const hasLinks = Boolean(project.repositoryUrl || project.demoUrl);
 
           return (
             <article
@@ -73,6 +74,37 @@ export default function Projects() {
                   </span>
                 ))}
               </div>
+
+              {project.accessNote ? (
+                <p className="mt-5 font-mono text-xs text-zinc-500">{project.accessNote}</p>
+              ) : null}
+
+              {hasLinks ? (
+                <div className="mt-6 flex flex-wrap gap-3 border-t border-white/[0.08] pt-5">
+                  {project.repositoryUrl ? (
+                    <a
+                      href={project.repositoryUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="tech-chip inline-flex h-10 items-center gap-2 rounded-md px-3.5 text-sm font-medium text-zinc-100 transition-colors hover:border-cyan-200/40 hover:bg-white/[0.08] hover:text-white"
+                    >
+                      Ver repositorio
+                      <ArrowUpRight size={15} aria-hidden="true" />
+                    </a>
+                  ) : null}
+                  {project.demoUrl ? (
+                    <a
+                      href={project.demoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-10 items-center gap-2 rounded-md bg-emerald-300 px-3.5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
+                    >
+                      Ver demo
+                      <ArrowUpRight size={15} aria-hidden="true" />
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
             </article>
           );
         })}
