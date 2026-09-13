@@ -18,41 +18,68 @@ export const profileCredentials: ProfileCredential[] = [
   { label: "Nombre profesional", value: "Sergio Enrique Carey Alegre" },
   { label: "Formación", value: "Ingeniería Informática · Inacap" },
   { label: "Ubicación", value: "Arica, Chile" },
-  { label: "Especialidad", value: "Python, Django, IA y automatización" },
+  { label: "Especialidad", value: "Backend, IA aplicada, automatización y datos" },
 ];
 
 export const skillGroups: SkillGroup[] = [
   {
-    title: "Backend y Web",
-    items: ["Python", "Django", "Flask", "APIs", "SQL", "TypeScript"],
+    title: "Backend y Datos",
+    items: [
+      "Python",
+      "Django",
+      "Flask",
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
+      "MySQL",
+      "SQL",
+    ],
   },
   {
-    title: "IA y Automatización",
-    items: ["OpenAI", "Chatbots", "Twilio", "Webhooks", "Flujos internos"],
+    title: "IA, Automatización y Desktop",
+    items: [
+      "Ollama",
+      "LLMs",
+      "RAG",
+      "OpenAI",
+      "Tauri",
+      "Rust",
+      "Webhooks",
+      "GitHub Actions",
+    ],
   },
   {
-    title: "Producto y Soporte",
-    items: ["Soporte técnico", "Diagnóstico", "Operaciones", "Documentación", "UX"],
+    title: "Frontend e Infraestructura",
+    items: [
+      "TypeScript",
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "Three.js",
+      "Vercel",
+      "Heroku",
+      "Git / GitHub",
+    ],
   },
 ];
 
 export const services: Service[] = [
   {
-    title: "Desarrollo web operacional",
+    title: "Sistemas web y backend operacional",
     description:
-      "Aplicaciones internas claras, trazables y pensadas para equipos que trabajan todos los días con datos reales.",
-    points: ["Django", "Paneles administrativos", "Flujos de caja y pedidos"],
+      "Aplicaciones mantenibles para equipos que trabajan con pedidos, clientes, estados, pagos, datos y reglas de negocio reales.",
+    points: ["Django / Spring Boot", "APIs e integraciones", "PostgreSQL / MySQL"],
   },
   {
-    title: "Automatización e IA aplicada",
+    title: "IA aplicada y automatización",
     description:
-      "Chatbots y asistentes que capturan contexto, responden con criterio y conectan servicios externos.",
-    points: ["OpenAI", "Twilio", "Flask", "Webhooks"],
+      "Asistentes, modelos locales e integraciones que reducen tareas repetitivas y conectan servicios con procesos concretos.",
+    points: ["Ollama / LLMs", "Chatbots", "Automatización y webhooks"],
   },
   {
-    title: "Soporte técnico y mejora continua",
+    title: "Productos desktop, web y mejora continua",
     description:
-      "Diagnóstico de problemas, ordenamiento de procesos y mejoras incrementales sin perder estabilidad.",
-    points: ["Auditoría", "Mantenimiento", "Capacitación operativa"],
+      "Interfaces y herramientas digitales pensadas para evolucionar sin perder claridad, estabilidad ni trazabilidad técnica.",
+    points: ["Tauri / React", "Next.js", "CI y documentación"],
   },
 ];

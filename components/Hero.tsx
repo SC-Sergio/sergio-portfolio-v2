@@ -12,10 +12,10 @@ const Scene3D = dynamic(() => import("@/components/Scene3D"), {
 });
 
 const highlights = [
-  { name: "Python", detail: "Backend" },
-  { name: "Django", detail: "Sistemas web" },
-  { name: "IA aplicada", detail: "Asistentes" },
-  { name: "Automatización", detail: "Flujos reales" },
+  { name: "Python / Django", detail: "Backend operacional" },
+  { name: "IA local", detail: "Ollama / LLMs" },
+  { name: "Tauri / Rust", detail: "Aplicaciones desktop" },
+  { name: "Data / ML", detail: "Análisis y modelos" },
 ];
 const metrics = [
   { value: "4", label: "proyectos destacados" },
@@ -25,8 +25,8 @@ const metrics = [
 const professionalRail = [
   { label: "Base", value: "Arica, Chile" },
   { label: "Formación", value: "Inacap" },
-  { label: "Stack", value: "Python / Django / IA" },
-  { label: "Foco", value: "Automatización / Chatbots" },
+  { label: "Stack", value: "Python / Java / TypeScript" },
+  { label: "Foco", value: "Backend / IA / Automatización" },
 ];
 
 export default function Hero() {
@@ -51,7 +51,7 @@ export default function Hero() {
         >
           <div className="premium-surface mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-zinc-200">
             <Sparkles size={16} className="text-cyan-200" aria-hidden="true" />
-            Portafolio de desarrollo, IA y automatización
+            Portafolio de desarrollo, IA, automatización y datos
           </div>
 
           <h1 className="holographic-text inline-block max-w-4xl pb-2 text-5xl font-semibold leading-[1.12] sm:text-6xl lg:text-7xl">
@@ -61,10 +61,10 @@ export default function Hero() {
             Sergio Enrique Carey Alegre · Inacap · Arica, Chile
           </p>
           <p className="mt-5 max-w-2xl text-xl font-medium text-emerald-50 sm:text-2xl">
-            Ingeniero Informático enfocado en Python, Django, Inteligencia Artificial y soluciones web para operaciones reales.
+            Ingeniero Informático enfocado en backend, inteligencia artificial aplicada, automatización y productos digitales para problemas reales.
           </p>
           <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
-            Desarrollo sistemas claros, automatizaciones útiles y asistentes conversacionales que conectan procesos, equipos y clientes sin perder estabilidad.
+            Desarrollo sistemas mantenibles, asistentes locales, aplicaciones de escritorio y proyectos de datos que conectan procesos, equipos y usuarios sin perder estabilidad.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
