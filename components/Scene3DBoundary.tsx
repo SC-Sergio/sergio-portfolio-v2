@@ -3,12 +3,8 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import HeroCoreStatic from "@/components/HeroCoreStatic";
 
-export type SceneFallbackReason =
-  | "loading"
-  | "static"
-  | "load-error"
-  | "render-error"
-  | "no-webgl";
+export type SceneFallbackReason = "loading" | "static" | "deferred";
+export type SceneFailureReason = "load-error" | "render-error" | "no-webgl";
 
 /**
  * Comprueba si el navegador puede crear un contexto WebGL. React Three Fiber crea
@@ -32,9 +28,9 @@ export function canUseWebGL(): boolean {
 }
 
 /**
- * Representación estática del Hero: el núcleo neuronal en SVG. Se usa en el modo
- * estático, mientras carga la escena 3D y cuando falla, de modo que el área visual
- * y las capas del Hero se mantienen idénticas.
+ * Representación estática del Hero: el núcleo neuronal en SVG. Es la capa base:
+ * se ve en el modo estático, mientras se difiere o carga la escena 3D y cuando
+ * esta falla, de modo que el área visual y las capas del Hero no cambian.
  */
 export function SceneFallback({ reason = "loading" }: { reason?: SceneFallbackReason }) {
   return (
@@ -42,6 +38,14 @@ export function SceneFallback({ reason = "loading" }: { reason?: SceneFallbackRe
       <HeroCoreStatic />
     </div>
   );
+}
+
+/**
+ * Marca un fallo de la escena 3D para diagnóstico. No dibuja nada: la capa base
+ * (SceneFallback) sigue visible porque la escena nunca llega a estar lista.
+ */
+export function SceneFailure({ reason }: { reason: SceneFailureReason }) {
+  return <div aria-hidden="true" hidden data-scene-failure={reason} />;
 }
 
 type Scene3DErrorBoundaryProps = { children: ReactNode };
@@ -75,7 +79,7 @@ export class Scene3DErrorBoundary extends Component<
 
   render() {
     if (this.state.failed) {
-      return <SceneFallback reason="render-error" />;
+      return <SceneFailure reason="render-error" />;
     }
 
     return this.props.children;

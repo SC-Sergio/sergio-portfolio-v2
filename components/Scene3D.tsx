@@ -147,10 +147,22 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
   );
 }
 
-export default function Scene3D() {
+export type Scene3DProps = {
+  /** Se llama con `true` tras dibujar el primer frame y con `false` al desmontar. */
+  onReadyChange?: (ready: boolean) => void;
+};
+
+export default function Scene3D({ onReadyChange }: Scene3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [renderError, setRenderError] = useState<Error | null>(null);
+  const onReadyChangeRef = useRef(onReadyChange);
+
+  useEffect(() => {
+    onReadyChangeRef.current = onReadyChange;
+  }, [onReadyChange]);
+
+  useEffect(() => () => onReadyChangeRef.current?.(false), []);
   const reducedMotion = useSyncExternalStore(
     subscribeToReducedMotion,
     getReducedMotionSnapshot,
@@ -185,12 +197,20 @@ export default function Scene3D() {
     throw renderError;
   }
 
+  // Además avisa al Hero cuando el primer frame ya está dibujado: descargar el
+  // chunk no implica que WebGL esté listo, así que la transición espera a esto.
   const isolateRenderErrors = ({ gl, setFrameloop }: RootState) => {
     const render = gl.render.bind(gl);
+    let firstFrameReported = false;
 
     gl.render = (scene, camera) => {
       try {
         render(scene, camera);
+
+        if (!firstFrameReported) {
+          firstFrameReported = true;
+          onReadyChangeRef.current?.(true);
+        }
       } catch (error) {
         setFrameloop("never");
         setRenderError(error instanceof Error ? error : new Error(String(error)));
