@@ -5,6 +5,14 @@ import { Canvas, useFrame, useThree, type RootState } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BufferGeometry, Float32BufferAttribute } from "three";
 import type { Group } from "three";
+import {
+  NEURAL_CORE_INNER_SCALE,
+  NEURAL_CORE_RADIUS,
+  NEURAL_CORE_SHELL_SCALE,
+  neuralConnections,
+  neuralNodes,
+  neuralOrbits,
+} from "@/components/neuralCoreGeometry";
 
 const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
 
@@ -23,43 +31,6 @@ function getServerReducedMotionSnapshot() {
   return false;
 }
 
-const neuralNodes: Array<{ position: [number, number, number]; color: string; size: number }> = [
-  { position: [0, 0, 0], color: "#e0f2fe", size: 0.08 },
-  { position: [0.72, 0.46, 0.42], color: "#67e8f9", size: 0.046 },
-  { position: [-0.7, 0.38, 0.34], color: "#a7f3d0", size: 0.044 },
-  { position: [0.56, -0.66, 0.48], color: "#c4b5fd", size: 0.042 },
-  { position: [-0.46, -0.58, 0.5], color: "#67e8f9", size: 0.04 },
-  { position: [0.18, 0.84, -0.36], color: "#a7f3d0", size: 0.04 },
-  { position: [-0.86, -0.04, -0.28], color: "#c4b5fd", size: 0.04 },
-  { position: [0.88, -0.1, -0.22], color: "#67e8f9", size: 0.04 },
-  { position: [-0.08, -0.9, -0.3], color: "#a7f3d0", size: 0.038 },
-  { position: [0.42, 0.08, 0.82], color: "#c4b5fd", size: 0.036 },
-  { position: [-0.3, 0.16, -0.78], color: "#67e8f9", size: 0.036 },
-  { position: [0.22, -0.28, -0.72], color: "#a7f3d0", size: 0.034 },
-];
-
-const neuralConnections: Array<[number, number]> = [
-  [0, 1],
-  [0, 2],
-  [0, 3],
-  [0, 4],
-  [0, 5],
-  [0, 6],
-  [0, 7],
-  [1, 5],
-  [1, 7],
-  [1, 9],
-  [2, 5],
-  [2, 6],
-  [3, 7],
-  [3, 8],
-  [4, 6],
-  [4, 8],
-  [5, 10],
-  [6, 10],
-  [7, 11],
-  [8, 11],
-];
 
 function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
   const groupRef = useRef<Group>(null);
@@ -121,8 +92,8 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
         </lineSegments>
 
         <group ref={pulseRef}>
-          <mesh scale={0.68}>
-            <icosahedronGeometry args={[0.42, 1]} />
+          <mesh scale={NEURAL_CORE_INNER_SCALE}>
+            <icosahedronGeometry args={[NEURAL_CORE_RADIUS, 1]} />
             <meshStandardMaterial
               color="#e0f2fe"
               emissive="#22d3ee"
@@ -133,8 +104,8 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
               opacity={0.84}
             />
           </mesh>
-          <mesh scale={0.92}>
-            <icosahedronGeometry args={[0.42, 0]} />
+          <mesh scale={NEURAL_CORE_SHELL_SCALE}>
+            <icosahedronGeometry args={[NEURAL_CORE_RADIUS, 0]} />
             <meshStandardMaterial
               color="#a7f3d0"
               emissive="#064e3b"
@@ -163,23 +134,35 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
         ))}
       </Float>
 
-      <mesh rotation={[0.5, 0.24, 0.16]} scale={1.28}>
-        <torusGeometry args={[1.05, 0.006, 8, 64]} />
-        <meshStandardMaterial color="#67e8f9" emissive="#075985" emissiveIntensity={0.46} transparent opacity={0.58} />
+      <mesh rotation={neuralOrbits[0].rotation} scale={neuralOrbits[0].scale}>
+        <torusGeometry args={[neuralOrbits[0].radius, 0.006, 8, 64]} />
+        <meshStandardMaterial color={neuralOrbits[0].color} emissive="#075985" emissiveIntensity={0.46} transparent opacity={neuralOrbits[0].opacity} />
       </mesh>
 
-      <mesh rotation={[-0.46, 0.4, -0.2]} scale={1.48}>
-        <torusGeometry args={[1.03, 0.005, 8, 72]} />
-        <meshStandardMaterial color="#c4b5fd" emissive="#4c1d95" emissiveIntensity={0.34} transparent opacity={0.42} />
+      <mesh rotation={neuralOrbits[1].rotation} scale={neuralOrbits[1].scale}>
+        <torusGeometry args={[neuralOrbits[1].radius, 0.005, 8, 72]} />
+        <meshStandardMaterial color={neuralOrbits[1].color} emissive="#4c1d95" emissiveIntensity={0.34} transparent opacity={neuralOrbits[1].opacity} />
       </mesh>
     </group>
   );
 }
 
-export default function Scene3D() {
+export type Scene3DProps = {
+  /** Se llama con `true` tras dibujar el primer frame y con `false` al desmontar. */
+  onReadyChange?: (ready: boolean) => void;
+};
+
+export default function Scene3D({ onReadyChange }: Scene3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [renderError, setRenderError] = useState<Error | null>(null);
+  const onReadyChangeRef = useRef(onReadyChange);
+
+  useEffect(() => {
+    onReadyChangeRef.current = onReadyChange;
+  }, [onReadyChange]);
+
+  useEffect(() => () => onReadyChangeRef.current?.(false), []);
   const reducedMotion = useSyncExternalStore(
     subscribeToReducedMotion,
     getReducedMotionSnapshot,
@@ -214,12 +197,20 @@ export default function Scene3D() {
     throw renderError;
   }
 
+  // Además avisa al Hero cuando el primer frame ya está dibujado: descargar el
+  // chunk no implica que WebGL esté listo, así que la transición espera a esto.
   const isolateRenderErrors = ({ gl, setFrameloop }: RootState) => {
     const render = gl.render.bind(gl);
+    let firstFrameReported = false;
 
     gl.render = (scene, camera) => {
       try {
         render(scene, camera);
+
+        if (!firstFrameReported) {
+          firstFrameReported = true;
+          onReadyChangeRef.current?.(true);
+        }
       } catch (error) {
         setFrameloop("never");
         setRenderError(error instanceof Error ? error : new Error(String(error)));

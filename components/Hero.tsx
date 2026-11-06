@@ -2,21 +2,32 @@
 
 import { ArrowDown, ArrowUpRight, Cpu, Sparkles } from "lucide-react";
 import dynamic from "next/dynamic";
-import { canUseWebGL, Scene3DErrorBoundary, SceneFallback } from "@/components/Scene3DBoundary";
+import { useState } from "react";
+import type { Scene3DProps } from "@/components/Scene3D";
+import {
+  canUseWebGL,
+  Scene3DErrorBoundary,
+  SceneFailure,
+  SceneFallback,
+  type SceneFallbackReason,
+} from "@/components/Scene3DBoundary";
+import { useDeferredSceneRequest } from "@/components/useDeferredSceneRequest";
+import { useHeroSceneMode } from "@/components/useHeroSceneMode";
 
 function SceneLoadErrorFallback() {
-  return <SceneFallback reason="load-error" />;
+  return <SceneFailure reason="load-error" />;
 }
 
 function SceneNoWebGLFallback() {
-  return <SceneFallback reason="no-webgl" />;
+  return <SceneFailure reason="no-webgl" />;
 }
 
 // La escena 3D es decorativa. Sin WebGL no se descarga Three.js; y si su chunk no
-// se descarga o su módulo falla al cargarse, la importación se resuelve con el
-// fondo estático en lugar de rechazarse, para que el error no llegue al boundary
-// global de Next.js. El loader solo corre en el cliente (ssr: false).
-const Scene3D = dynamic(
+// se descarga o su módulo falla al cargarse, la importación se resuelve con un
+// marcador de fallo en lugar de rechazarse, para que el error no llegue al boundary
+// global de Next.js. El loader solo corre en el cliente (ssr: false) y solo cuando
+// Hero renderiza la escena, nunca en el modo estático.
+const Scene3D = dynamic<Scene3DProps>(
   () => {
     if (!canUseWebGL()) {
       console.info("[Scene3D] WebGL no disponible; se muestra el fondo estático.");
@@ -30,7 +41,7 @@ const Scene3D = dynamic(
   },
   {
     ssr: false,
-    loading: () => <SceneFallback />,
+    loading: () => null,
   },
 );
 
@@ -58,16 +69,43 @@ const professionalRail = [
 const heroEnter =
   "transition-transform duration-700 ease-out motion-reduce:transition-none";
 
+// Fundido entre capas; visibility se oculta al final de la transición para que la
+// capa SVG deje de pintarse (y de animar su pulso) mientras se ve la escena 3D.
+const sceneLayerFade =
+  "transition-[opacity,visibility] duration-700 ease-out motion-reduce:transition-none";
+
 export default function Hero() {
+  // El núcleo SVG es la capa base desde el HTML inicial. La escena 3D solo se
+  // solicita en modo "webgl" y de forma diferida; en el servidor, durante la
+  // hidratación y en el modo estático no se renderiza, por lo que el chunk de
+  // Three.js no se descarga. El SVG cede su lugar solo cuando WebGL ya dibujó.
+  const sceneMode = useHeroSceneMode();
+  const sceneRequested = useDeferredSceneRequest(sceneMode === "webgl");
+  const [sceneReady, setSceneReady] = useState(false);
+  const renderScene = sceneMode === "webgl" && sceneRequested;
+  const sceneVisible = renderScene && sceneReady;
+  const baseReason: SceneFallbackReason =
+    sceneMode === "static" ? "static" : sceneMode === "webgl" && !sceneRequested ? "deferred" : "loading";
+
   return (
     <section
       id="home"
       className="tech-frame relative isolate flex min-h-[94svh] items-center overflow-hidden px-4 pt-24 sm:px-6 lg:px-8"
     >
-      <div className="absolute inset-0 -z-30">
-        <Scene3DErrorBoundary>
-          <Scene3D />
-        </Scene3DErrorBoundary>
+      <div className="absolute inset-0 -z-30" data-hero-scene-mode={sceneMode}>
+        <div className={`absolute inset-0 ${sceneLayerFade} ${sceneVisible ? "invisible opacity-0" : "visible opacity-100"}`}>
+          <SceneFallback reason={baseReason} />
+        </div>
+        {renderScene ? (
+          <div
+            className={`absolute inset-0 ${sceneLayerFade} ${sceneVisible ? "opacity-100" : "opacity-0"}`}
+            data-scene-ready={sceneVisible ? "true" : "false"}
+          >
+            <Scene3DErrorBoundary>
+              <Scene3D onReadyChange={setSceneReady} />
+            </Scene3DErrorBoundary>
+          </div>
+        ) : null}
       </div>
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_28%,rgba(34,211,238,0.18),transparent_28rem),radial-gradient(circle_at_84%_64%,rgba(139,92,246,0.12),transparent_24rem),linear-gradient(90deg,#050607_0%,rgba(5,6,7,0.97)_39%,rgba(5,6,7,0.76)_68%,rgba(5,6,7,0.36)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-t from-[#050607] to-transparent" />

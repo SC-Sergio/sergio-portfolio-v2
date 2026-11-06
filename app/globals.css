@@ -23,6 +23,25 @@
   --font-mono: var(--font-mono-local);
 }
 
+/* Pulso del núcleo estático del Hero: solo transform y opacity, y finito (3 ciclos)
+   para no mantener trabajo de animación continuo; termina en su estado de reposo. */
+@theme {
+  --animate-core-pulse: core-pulse 6s ease-in-out 3 both;
+
+  @keyframes core-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scale(0.92);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.06);
+    }
+  }
+}
+
 * {
   box-sizing: border-box;
 }
