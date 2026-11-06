@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import {
   NEURAL_CORE_INNER_SCALE,
   NEURAL_CORE_RADIUS,
@@ -72,13 +75,37 @@ const innerRadius = round(NEURAL_CORE_RADIUS * NEURAL_CORE_INNER_SCALE);
  * cuando la escena WebGL va a reemplazar al SVG, animarlo sería trabajo sin valor.
  */
 export default function HeroCoreStatic({ animated = false }: { animated?: boolean }) {
+  const glowRef = useRef<HTMLDivElement>(null);
+
+  // Pausa el pulso cuando el núcleo sale de la vista y lo reanuda al volver, sin
+  // reiniciarlo ni pasar por el estado de React (no hay re-render ni diferencias de
+  // hidratación). Con la pestaña oculta el navegador ya no produce frames.
+  useEffect(() => {
+    const glow = glowRef.current;
+
+    if (!animated || !glow || typeof IntersectionObserver !== "function") {
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      glow.style.animationPlayState = entry.isIntersecting ? "running" : "paused";
+    });
+
+    observer.observe(glow);
+
+    return () => {
+      observer.disconnect();
+      glow.style.animationPlayState = "";
+    };
+  }, [animated]);
+
   return (
     <div aria-hidden="true" data-hero-core-static="" className="pointer-events-none absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(34,211,238,0.16),transparent_34rem)]" />
       {/* En pantallas angostas el núcleo asoma desde el borde derecho para no
           quedar detrás del texto; desde lg replica la posición de la escena 3D. */}
       <div className="absolute left-[98%] top-[34%] aspect-square w-[min(135vw,38rem)] -translate-x-1/2 -translate-y-1/2 opacity-60 sm:left-[97%] sm:top-[33%] sm:w-[min(84vw,44rem)] sm:opacity-55 lg:left-[66%] lg:top-[51%] lg:h-[79%] lg:w-auto lg:opacity-100">
-        <div className={`absolute left-1/2 top-1/2 size-[42%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.34),rgba(34,211,238,0.1)_42%,transparent_70%)] opacity-55 ${animated ? "animate-core-pulse motion-reduce:animate-none" : ""}`} />
+        <div ref={glowRef} className={`absolute left-1/2 top-1/2 size-[42%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.34),rgba(34,211,238,0.1)_42%,transparent_70%)] opacity-55 ${animated ? "animate-core-pulse motion-reduce:animate-none" : ""}`} />
         <svg viewBox="-1.65 -1.65 3.3 3.3" className="absolute inset-0 h-full w-full overflow-visible" focusable="false">
           <defs>
             <radialGradient id="hero-core-fill" cx="42%" cy="38%" r="62%">
