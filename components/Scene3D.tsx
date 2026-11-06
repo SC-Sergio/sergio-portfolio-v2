@@ -36,6 +36,40 @@ const FLOAT_SPEED = 0.85;
 const FLOAT_ROTATION_INTENSITY = 0.16;
 const FLOAT_INTENSITY = 0.28;
 
+// La animación del núcleo es lenta (0.1 rad/s), así que ~30 FPS bastan para
+// verse fluida. Con frameloop "demand", este bucle invalida la escena cada ~33 ms
+// solo mientras debe animarse; fuera de vista o con la pestaña oculta no corre.
+const TARGET_FRAME_INTERVAL_MS = 1000 / 30;
+
+function FrameThrottle({ active }: { active: boolean }) {
+  const invalidate = useThree((state) => state.invalidate);
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    let frameId = 0;
+    let lastRender = Number.NEGATIVE_INFINITY;
+
+    const tick = (now: number) => {
+      // 1 ms de tolerancia para que a 60 Hz se dibuje exactamente un frame de cada dos.
+      if (now - lastRender >= TARGET_FRAME_INTERVAL_MS - 1) {
+        lastRender = now;
+        invalidate();
+      }
+
+      frameId = requestAnimationFrame(tick);
+    };
+
+    frameId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(frameId);
+  }, [active, invalidate]);
+
+  return null;
+}
+
 // Nodos periféricos de atrás hacia adelante: el InstancedMesh los dibuja en este
 // orden en una sola llamada, aproximando el orden de transparencia de las mallas.
 const peripheralNodes = neuralNodes.slice(1).sort((a, b) => a.position[2] - b.position[2]);
@@ -59,8 +93,17 @@ function NeuralNodes() {
     });
 
     nodeMaterial.onBeforeCompile = (shader) => {
+      const emissiveLine = "vec3 totalEmissiveRadiance = emissive;";
+
+      if (!shader.fragmentShader.includes(emissiveLine)) {
+        // Si una versión de three cambia el shader, los nodos se verían blancos:
+        // se avisa para detectarlo en lugar de fallar en silencio.
+        console.warn("[Scene3D] No se pudo aplicar el color emisivo por instancia de los nodos.");
+        return;
+      }
+
       shader.fragmentShader = shader.fragmentShader.replace(
-        "vec3 totalEmissiveRadiance = emissive;",
+        emissiveLine,
         "vec3 totalEmissiveRadiance = emissive * vColor.rgb;",
       );
     };
@@ -296,7 +339,7 @@ export default function Scene3D({ onReadyChange }: Scene3DProps) {
         aria-hidden="true"
         camera={{ position: [0, 0, 5.1], fov: 43 }}
         dpr={[1, 1.1]}
-        frameloop={shouldAnimate ? "always" : "demand"}
+        frameloop="demand"
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         onCreated={isolateRenderErrors}
       >
@@ -304,6 +347,7 @@ export default function Scene3D({ onReadyChange }: Scene3DProps) {
         <directionalLight position={[3, 3, 5]} intensity={1.85} color="#e0f2fe" />
         <pointLight position={[-4, -2, 3]} intensity={1.05} color="#a78bfa" />
         <CoreShape reducedMotion={!shouldAnimate} />
+        <FrameThrottle active={shouldAnimate} />
       </Canvas>
     </div>
   );
