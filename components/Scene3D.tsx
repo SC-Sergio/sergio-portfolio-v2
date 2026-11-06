@@ -1,7 +1,7 @@
 "use client";
 
 import { Float } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type RootState } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BufferGeometry, Float32BufferAttribute } from "three";
 import type { Group } from "three";
@@ -164,6 +164,7 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
 export default function Scene3D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [renderError, setRenderError] = useState<Error | null>(null);
   const reducedMotion = useSyncExternalStore(
     subscribeToReducedMotion,
     getReducedMotionSnapshot,
@@ -190,6 +191,27 @@ export default function Scene3D() {
     return () => observer.disconnect();
   }, []);
 
+  // React Three Fiber ejecuta el render en requestAnimationFrame, fuera del árbol
+  // de React, y programa el siguiente frame antes de dibujar: un error ahí se
+  // repetiría en cada frame. Se detiene el bucle y se relanza el error durante el
+  // render de React para que lo capture Scene3DErrorBoundary.
+  if (renderError) {
+    throw renderError;
+  }
+
+  const isolateRenderErrors = ({ gl, setFrameloop }: RootState) => {
+    const render = gl.render.bind(gl);
+
+    gl.render = (scene, camera) => {
+      try {
+        render(scene, camera);
+      } catch (error) {
+        setFrameloop("never");
+        setRenderError(error instanceof Error ? error : new Error(String(error)));
+      }
+    };
+  };
+
   return (
     <div ref={containerRef} className="h-full w-full">
       <Canvas
@@ -198,6 +220,7 @@ export default function Scene3D() {
         dpr={[1, 1.1]}
         frameloop={shouldAnimate ? "always" : "demand"}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        onCreated={isolateRenderErrors}
       >
         <ambientLight intensity={0.75} />
         <directionalLight position={[3, 3, 5]} intensity={1.85} color="#e0f2fe" />

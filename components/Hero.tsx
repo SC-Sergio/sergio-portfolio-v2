@@ -2,13 +2,37 @@
 
 import { ArrowDown, ArrowUpRight, Cpu, Sparkles } from "lucide-react";
 import dynamic from "next/dynamic";
+import { canUseWebGL, Scene3DErrorBoundary, SceneFallback } from "@/components/Scene3DBoundary";
 
-const Scene3D = dynamic(() => import("@/components/Scene3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-full w-full bg-[radial-gradient(circle_at_72%_42%,rgba(34,211,238,0.16),transparent_34rem)]" />
-  ),
-});
+function SceneLoadErrorFallback() {
+  return <SceneFallback reason="load-error" />;
+}
+
+function SceneNoWebGLFallback() {
+  return <SceneFallback reason="no-webgl" />;
+}
+
+// La escena 3D es decorativa. Sin WebGL no se descarga Three.js; y si su chunk no
+// se descarga o su módulo falla al cargarse, la importación se resuelve con el
+// fondo estático en lugar de rechazarse, para que el error no llegue al boundary
+// global de Next.js. El loader solo corre en el cliente (ssr: false).
+const Scene3D = dynamic(
+  () => {
+    if (!canUseWebGL()) {
+      console.info("[Scene3D] WebGL no disponible; se muestra el fondo estático.");
+      return Promise.resolve({ default: SceneNoWebGLFallback });
+    }
+
+    return import("@/components/Scene3D").catch((error: unknown) => {
+      console.warn("[Scene3D] No se pudo cargar la escena 3D; se muestra el fondo estático.", error);
+      return { default: SceneLoadErrorFallback };
+    });
+  },
+  {
+    ssr: false,
+    loading: () => <SceneFallback />,
+  },
+);
 
 const highlights = [
   { name: "Python / Django", detail: "Backend operacional" },
@@ -41,7 +65,9 @@ export default function Hero() {
       className="tech-frame relative isolate flex min-h-[94svh] items-center overflow-hidden px-4 pt-24 sm:px-6 lg:px-8"
     >
       <div className="absolute inset-0 -z-30">
-        <Scene3D />
+        <Scene3DErrorBoundary>
+          <Scene3D />
+        </Scene3DErrorBoundary>
       </div>
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_28%,rgba(34,211,238,0.18),transparent_28rem),radial-gradient(circle_at_84%_64%,rgba(139,92,246,0.12),transparent_24rem),linear-gradient(90deg,#050607_0%,rgba(5,6,7,0.97)_39%,rgba(5,6,7,0.76)_68%,rgba(5,6,7,0.36)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-t from-[#050607] to-transparent" />
