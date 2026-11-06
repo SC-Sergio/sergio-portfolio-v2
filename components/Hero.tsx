@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowDown, ArrowUpRight, Cpu, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
 import dynamic from "next/dynamic";
 
 const Scene3D = dynamic(() => import("@/components/Scene3D"), {
@@ -29,6 +28,12 @@ const professionalRail = [
   { label: "Foco", value: "Backend / IA / Automatización" },
 ];
 
+// Entrada solo con desplazamiento, resuelta por CSS (@starting-style) en el primer
+// pintado: el contenido nunca se oculta, no espera a la hidratación de React y no
+// genera layout shift (solo transform). Con prefers-reduced-motion no hay transición.
+const heroEnter =
+  "transition-transform duration-700 ease-out motion-reduce:transition-none";
+
 export default function Hero() {
   return (
     <section
@@ -43,12 +48,7 @@ export default function Hero() {
       <div className="absolute right-[6%] top-28 -z-10 hidden h-56 w-56 rounded-full border border-cyan-200/[0.08] bg-cyan-300/[0.025] blur-xl lg:block" />
 
       <div className="mx-auto grid w-full max-w-[92rem] gap-8 pb-12 lg:grid-cols-12 lg:items-center 2xl:max-w-[96rem]">
-        <motion.div
-          className="max-w-3xl lg:col-span-6 xl:col-span-5"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, ease: "easeOut" }}
-        >
+        <div className={`max-w-3xl lg:col-span-6 xl:col-span-5 ${heroEnter} starting:translate-y-6`}>
           <div className="premium-surface mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-zinc-200">
             <Sparkles size={16} className="text-cyan-200" aria-hidden="true" />
             Portafolio de desarrollo, IA, automatización y datos
@@ -104,13 +104,10 @@ export default function Hero() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          className="relative hidden min-h-[27rem] lg:col-span-6 lg:block xl:col-span-5 2xl:min-h-[31rem]"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, ease: "easeOut", delay: 0.18 }}
+        <div
+          className={`relative hidden min-h-[27rem] lg:col-span-6 lg:block xl:col-span-5 2xl:min-h-[31rem] ${heroEnter} delay-150 starting:translate-y-[18px]`}
         >
           <div className="hero-orbit-stage absolute inset-y-2 left-0 right-0 rounded-2xl" aria-hidden="true" />
           <div className="absolute left-0 top-8 grid w-44 gap-3 2xl:left-4">
@@ -137,14 +134,11 @@ export default function Hero() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.aside
-          className="hidden xl:col-span-2 xl:grid xl:gap-3"
+        <aside
+          className={`hidden xl:col-span-2 xl:grid xl:gap-3 ${heroEnter} delay-200 starting:translate-x-[18px]`}
           aria-label="Datos profesionales destacados"
-          initial={{ opacity: 0, x: 18 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.65, ease: "easeOut", delay: 0.25 }}
         >
           {professionalRail.map((item) => (
             <div key={item.label} className="tech-chip rounded-lg p-4">
@@ -152,7 +146,7 @@ export default function Hero() {
               <p className="mt-2 text-sm font-medium leading-6 text-zinc-100">{item.value}</p>
             </div>
           ))}
-        </motion.aside>
+        </aside>
       </div>
     </section>
   );
