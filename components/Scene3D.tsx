@@ -1,6 +1,5 @@
 "use client";
 
-import { Float } from "@react-three/drei";
 import { Canvas, useFrame, useThree, type RootState } from "@react-three/fiber";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BufferGeometry, Color, Float32BufferAttribute, Matrix4, MeshStandardMaterial } from "three";
@@ -30,6 +29,12 @@ function getReducedMotionSnapshot() {
 function getServerReducedMotionSnapshot() {
   return false;
 }
+
+// Paso máximo de la animación por frame (s): evita saltos tras una pausa.
+const MAX_ANIMATION_STEP = 0.1;
+const FLOAT_SPEED = 0.85;
+const FLOAT_ROTATION_INTENSITY = 0.16;
+const FLOAT_INTENSITY = 0.28;
 
 // Nodos periféricos de atrás hacia adelante: el InstancedMesh los dibuja en este
 // orden en una sola llamada, aproximando el orden de transparencia de las mallas.
@@ -118,14 +123,21 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
   // relanza en el render para que llegue a Scene3DErrorBoundary.
   const frameFailedRef = useRef(false);
   const [frameError, setFrameError] = useState<Error | null>(null);
+  const floatRef = useRef<Group>(null);
+  // Tiempo propio de la animación. El reloj de R3F sigue corriendo con la pestaña
+  // oculta y se reinicia a 0 cada vez que cambia el frameloop (Hero fuera de vista),
+  // lo que hacía saltar la escena al volver. Aquí solo avanza con frames dibujados
+  // y cada paso se limita a MAX_ANIMATION_STEP.
+  const animationTimeRef = useRef(0);
 
-  useFrame((state) => {
+  useFrame((_state, delta) => {
     if (!groupRef.current || reducedMotion || frameFailedRef.current) {
       return;
     }
 
     try {
-      const elapsed = state.clock.getElapsedTime();
+      animationTimeRef.current += Math.min(delta, MAX_ANIMATION_STEP);
+      const elapsed = animationTimeRef.current;
       groupRef.current.rotation.y = elapsed * 0.1;
       groupRef.current.rotation.x = Math.sin(elapsed * 0.2) * 0.055;
       groupRef.current.rotation.z = Math.sin(elapsed * 0.14) * 0.025;
@@ -133,6 +145,18 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
       if (pulseRef.current) {
         const pulse = 1 + Math.sin(elapsed * 1.35) * 0.025;
         pulseRef.current.scale.setScalar(pulse);
+      }
+
+      // Misma fórmula que <Float> de drei (speed 0.85, rotationIntensity 0.16,
+      // floatIntensity 0.28, rango [-0.1, 0.1]), con el tiempo propio.
+      if (floatRef.current) {
+        const phase = (elapsed / 4) * FLOAT_SPEED;
+        floatRef.current.rotation.set(
+          (Math.cos(phase) / 8) * FLOAT_ROTATION_INTENSITY,
+          (Math.sin(phase) / 8) * FLOAT_ROTATION_INTENSITY,
+          (Math.sin(phase) / 20) * FLOAT_ROTATION_INTENSITY,
+        );
+        floatRef.current.position.y = (Math.sin(phase) / 10) * FLOAT_INTENSITY;
       }
     } catch (error) {
       frameFailedRef.current = true;
@@ -146,11 +170,7 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
 
   return (
     <group ref={groupRef} scale={scale} position={[1.1, -0.05, 0]}>
-      <Float
-        speed={reducedMotion ? 0 : 0.85}
-        rotationIntensity={reducedMotion ? 0 : 0.16}
-        floatIntensity={reducedMotion ? 0 : 0.28}
-      >
+      <group ref={floatRef}>
         <lineSegments geometry={connectionGeometry}>
           <lineBasicMaterial color="#67e8f9" transparent opacity={0.34} />
         </lineSegments>
@@ -184,7 +204,7 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
         </group>
 
         <NeuralNodes />
-      </Float>
+      </group>
 
       <mesh rotation={neuralOrbits[0].rotation} scale={neuralOrbits[0].scale}>
         <torusGeometry args={[neuralOrbits[0].radius, 0.006, 8, 64]} />
