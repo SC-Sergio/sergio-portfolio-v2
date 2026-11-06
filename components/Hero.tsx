@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUpRight, Cpu, Sparkles } from "lucide-react";
 import dynamic from "next/dynamic";
 import { canUseWebGL, Scene3DErrorBoundary, SceneFallback } from "@/components/Scene3DBoundary";
+import { useHeroSceneMode } from "@/components/useHeroSceneMode";
 
 function SceneLoadErrorFallback() {
   return <SceneFallback reason="load-error" />;
@@ -59,15 +60,24 @@ const heroEnter =
   "transition-transform duration-700 ease-out motion-reduce:transition-none";
 
 export default function Hero() {
+  // La escena 3D solo se solicita en modo "webgl"; en el servidor, durante la
+  // hidratación y en el modo estático no se renderiza, por lo que el chunk de
+  // Three.js no se descarga.
+  const sceneMode = useHeroSceneMode();
+
   return (
     <section
       id="home"
       className="tech-frame relative isolate flex min-h-[94svh] items-center overflow-hidden px-4 pt-24 sm:px-6 lg:px-8"
     >
-      <div className="absolute inset-0 -z-30">
-        <Scene3DErrorBoundary>
-          <Scene3D />
-        </Scene3DErrorBoundary>
+      <div className="absolute inset-0 -z-30" data-hero-scene-mode={sceneMode}>
+        {sceneMode === "webgl" ? (
+          <Scene3DErrorBoundary>
+            <Scene3D />
+          </Scene3DErrorBoundary>
+        ) : (
+          <SceneFallback reason={sceneMode === "pending" ? "loading" : "static"} />
+        )}
       </div>
       <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_28%,rgba(34,211,238,0.18),transparent_28rem),radial-gradient(circle_at_84%_64%,rgba(139,92,246,0.12),transparent_24rem),linear-gradient(90deg,#050607_0%,rgba(5,6,7,0.97)_39%,rgba(5,6,7,0.76)_68%,rgba(5,6,7,0.36)_100%)]" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-t from-[#050607] to-transparent" />

@@ -2,7 +2,12 @@
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
-export type SceneFallbackReason = "loading" | "load-error" | "render-error" | "no-webgl";
+export type SceneFallbackReason =
+  | "loading"
+  | "static"
+  | "load-error"
+  | "render-error"
+  | "no-webgl";
 
 /**
  * Comprueba si el navegador puede crear un contexto WebGL. React Three Fiber crea
