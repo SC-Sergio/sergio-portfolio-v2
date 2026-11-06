@@ -74,7 +74,7 @@ export default function HeroCoreStatic() {
       {/* En pantallas angostas el núcleo asoma desde el borde derecho para no
           quedar detrás del texto; desde lg replica la posición de la escena 3D. */}
       <div className="absolute left-[98%] top-[34%] aspect-square w-[min(135vw,38rem)] -translate-x-1/2 -translate-y-1/2 opacity-60 sm:left-[97%] sm:top-[33%] sm:w-[min(84vw,44rem)] sm:opacity-55 lg:left-[66%] lg:top-[51%] lg:h-[79%] lg:w-auto lg:opacity-100">
-        <div className="absolute left-1/2 top-1/2 size-[42%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.34),rgba(34,211,238,0.1)_42%,transparent_70%)] animate-core-pulse motion-reduce:animate-none" />
+        <div className="absolute left-1/2 top-1/2 size-[42%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.34),rgba(34,211,238,0.1)_42%,transparent_70%)] opacity-55 animate-core-pulse motion-reduce:animate-none" />
         <svg viewBox="-1.65 -1.65 3.3 3.3" className="absolute inset-0 h-full w-full overflow-visible" focusable="false">
           <defs>
             <radialGradient id="hero-core-fill" cx="42%" cy="38%" r="62%">

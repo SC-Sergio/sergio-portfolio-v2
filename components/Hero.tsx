@@ -69,7 +69,10 @@ const professionalRail = [
 const heroEnter =
   "transition-transform duration-700 ease-out motion-reduce:transition-none";
 
-const sceneLayerFade = "transition-opacity duration-700 ease-out motion-reduce:transition-none";
+// Fundido entre capas; visibility se oculta al final de la transición para que la
+// capa SVG deje de pintarse (y de animar su pulso) mientras se ve la escena 3D.
+const sceneLayerFade =
+  "transition-[opacity,visibility] duration-700 ease-out motion-reduce:transition-none";
 
 export default function Hero() {
   // El núcleo SVG es la capa base desde el HTML inicial. La escena 3D solo se
@@ -90,7 +93,7 @@ export default function Hero() {
       className="tech-frame relative isolate flex min-h-[94svh] items-center overflow-hidden px-4 pt-24 sm:px-6 lg:px-8"
     >
       <div className="absolute inset-0 -z-30" data-hero-scene-mode={sceneMode}>
-        <div className={`absolute inset-0 ${sceneLayerFade} ${sceneVisible ? "opacity-0" : "opacity-100"}`}>
+        <div className={`absolute inset-0 ${sceneLayerFade} ${sceneVisible ? "invisible opacity-0" : "visible opacity-100"}`}>
           <SceneFallback reason={baseReason} />
         </div>
         {renderScene ? (
