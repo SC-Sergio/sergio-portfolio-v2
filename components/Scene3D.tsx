@@ -2,9 +2,9 @@
 
 import { Float } from "@react-three/drei";
 import { Canvas, useFrame, useThree, type RootState } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { BufferGeometry, Float32BufferAttribute } from "three";
-import type { Group } from "three";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { BufferGeometry, Color, Float32BufferAttribute, Matrix4, MeshStandardMaterial } from "three";
+import type { Group, InstancedMesh } from "three";
 import {
   NEURAL_CORE_INNER_SCALE,
   NEURAL_CORE_RADIUS,
@@ -31,6 +31,70 @@ function getServerReducedMotionSnapshot() {
   return false;
 }
 
+// Nodos periféricos de atrás hacia adelante: el InstancedMesh los dibuja en este
+// orden en una sola llamada, aproximando el orden de transparencia de las mallas.
+const peripheralNodes = neuralNodes.slice(1).sort((a, b) => a.position[2] - b.position[2]);
+
+/**
+ * Los 11 nodos periféricos en una sola llamada de dibujo: una esfera compartida y
+ * un material compartido con color por instancia. Para conservar el aspecto (cada
+ * nodo usaba su color como color base y como emisivo a 0.9), el material es blanco
+ * y el emisivo se multiplica por el color de la instancia en el shader.
+ */
+function NeuralNodes() {
+  const meshRef = useRef<InstancedMesh>(null);
+  const material = useMemo(() => {
+    const nodeMaterial = new MeshStandardMaterial({
+      color: "#ffffff",
+      emissive: "#ffffff",
+      emissiveIntensity: 0.9,
+      roughness: 0.32,
+      transparent: true,
+      opacity: 0.88,
+    });
+
+    nodeMaterial.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "vec3 totalEmissiveRadiance = emissive;",
+        "vec3 totalEmissiveRadiance = emissive * vColor.rgb;",
+      );
+    };
+    nodeMaterial.customProgramCacheKey = () => "neural-node-instance-emissive";
+
+    return nodeMaterial;
+  }, []);
+
+  useLayoutEffect(() => {
+    const mesh = meshRef.current;
+
+    if (!mesh) {
+      return;
+    }
+
+    const matrix = new Matrix4();
+    const color = new Color();
+
+    peripheralNodes.forEach((node, index) => {
+      matrix.makeScale(node.size, node.size, node.size).setPosition(...node.position);
+      mesh.setMatrixAt(index, matrix);
+      mesh.setColorAt(index, color.set(node.color));
+    });
+
+    mesh.instanceMatrix.needsUpdate = true;
+
+    if (mesh.instanceColor) {
+      mesh.instanceColor.needsUpdate = true;
+    }
+
+    mesh.computeBoundingSphere();
+  }, []);
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, peripheralNodes.length]} material={material}>
+      <sphereGeometry args={[1, 10, 10]} />
+    </instancedMesh>
+  );
+}
 
 function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
   const groupRef = useRef<Group>(null);
@@ -119,19 +183,7 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
           </mesh>
         </group>
 
-        {neuralNodes.slice(1).map((node) => (
-          <mesh key={node.position.join(":")} position={node.position}>
-            <sphereGeometry args={[node.size, 10, 10]} />
-            <meshStandardMaterial
-              color={node.color}
-              emissive={node.color}
-              emissiveIntensity={0.9}
-              roughness={0.32}
-              transparent
-              opacity={0.88}
-            />
-          </mesh>
-        ))}
+        <NeuralNodes />
       </Float>
 
       <mesh rotation={neuralOrbits[0].rotation} scale={neuralOrbits[0].scale}>
