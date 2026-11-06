@@ -78,21 +78,36 @@ function CoreShape({ reducedMotion }: { reducedMotion: boolean }) {
     return geometry;
   }, []);
 
+  // Los callbacks de useFrame corren en el bucle de React Three Fiber, fuera de
+  // React: un error ahí se repetiría en cada frame. Se detiene el callback y se
+  // relanza en el render para que llegue a Scene3DErrorBoundary.
+  const frameFailedRef = useRef(false);
+  const [frameError, setFrameError] = useState<Error | null>(null);
+
   useFrame((state) => {
-    if (!groupRef.current || reducedMotion) {
+    if (!groupRef.current || reducedMotion || frameFailedRef.current) {
       return;
     }
 
-    const elapsed = state.clock.getElapsedTime();
-    groupRef.current.rotation.y = elapsed * 0.1;
-    groupRef.current.rotation.x = Math.sin(elapsed * 0.2) * 0.055;
-    groupRef.current.rotation.z = Math.sin(elapsed * 0.14) * 0.025;
+    try {
+      const elapsed = state.clock.getElapsedTime();
+      groupRef.current.rotation.y = elapsed * 0.1;
+      groupRef.current.rotation.x = Math.sin(elapsed * 0.2) * 0.055;
+      groupRef.current.rotation.z = Math.sin(elapsed * 0.14) * 0.025;
 
-    if (pulseRef.current) {
-      const pulse = 1 + Math.sin(elapsed * 1.35) * 0.025;
-      pulseRef.current.scale.setScalar(pulse);
+      if (pulseRef.current) {
+        const pulse = 1 + Math.sin(elapsed * 1.35) * 0.025;
+        pulseRef.current.scale.setScalar(pulse);
+      }
+    } catch (error) {
+      frameFailedRef.current = true;
+      setFrameError(error instanceof Error ? error : new Error(String(error)));
     }
   });
+
+  if (frameError) {
+    throw frameError;
+  }
 
   return (
     <group ref={groupRef} scale={scale} position={[1.1, -0.05, 0]}>
