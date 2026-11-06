@@ -1,6 +1,7 @@
 "use client";
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import HeroCoreStatic from "@/components/HeroCoreStatic";
 
 export type SceneFallbackReason =
   | "loading"
@@ -31,16 +32,15 @@ export function canUseWebGL(): boolean {
 }
 
 /**
- * Fondo estático del Hero. Se usa mientras carga la escena 3D y cuando falla,
- * de modo que el área visual y las capas del Hero se mantienen idénticas.
+ * Representación estática del Hero: el núcleo neuronal en SVG. Se usa en el modo
+ * estático, mientras carga la escena 3D y cuando falla, de modo que el área visual
+ * y las capas del Hero se mantienen idénticas.
  */
 export function SceneFallback({ reason = "loading" }: { reason?: SceneFallbackReason }) {
   return (
-    <div
-      aria-hidden="true"
-      data-scene-fallback={reason}
-      className="h-full w-full bg-[radial-gradient(circle_at_72%_42%,rgba(34,211,238,0.16),transparent_34rem)]"
-    />
+    <div aria-hidden="true" data-scene-fallback={reason} className="relative h-full w-full">
+      <HeroCoreStatic />
+    </div>
   );
 }
 

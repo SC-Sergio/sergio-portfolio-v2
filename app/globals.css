@@ -23,6 +23,24 @@
   --font-mono: var(--font-mono-local);
 }
 
+/* Pulso del núcleo estático del Hero: solo scale y opacity (compositor). */
+@theme {
+  --animate-core-pulse: core-pulse 7s ease-in-out infinite;
+
+  @keyframes core-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      scale: 0.92;
+    }
+
+    50% {
+      opacity: 1;
+      scale: 1.06;
+    }
+  }
+}
+
 * {
   box-sizing: border-box;
 }
