@@ -35,7 +35,7 @@ export function canUseWebGL(): boolean {
 export function SceneFallback({ reason = "loading" }: { reason?: SceneFallbackReason }) {
   return (
     <div aria-hidden="true" data-scene-fallback={reason} className="relative h-full w-full">
-      <HeroCoreStatic />
+      <HeroCoreStatic animated={reason === "static"} />
     </div>
   );
 }
