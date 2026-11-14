@@ -1,81 +1,95 @@
-import { BrainCircuit, ShieldCheck, Workflow } from "lucide-react";
-import AnimatedSection from "@/components/AnimatedSection";
-import { profileCredentials } from "@/data/skills";
+import { Briefcase, GraduationCap } from "lucide-react";
+import SectionHeader from "@/components/SectionHeader";
+import { education, experience, type TimelineItem } from "@/data/profile";
 
 const principles = [
   {
-    icon: Workflow,
-    title: "Procesos primero",
-    text: "Antes de programar, ordeno el flujo real: roles, estados, datos críticos, integraciones y puntos de control.",
+    title: "Entender el proceso antes del código",
+    text: "Primero ordeno el flujo real: roles, estados, datos críticos y puntos de control. El software viene después.",
   },
   {
-    icon: ShieldCheck,
-    title: "Estabilidad visible",
-    text: "Priorizo cambios incrementales, trazabilidad, CI y experiencias entendibles para usuarios y equipos operativos.",
+    title: "Cambios pequeños y verificables",
+    text: "Pruebas, integración continua y documentación honesta: lo que el README dice es lo que el código hace.",
   },
   {
-    icon: BrainCircuit,
-    title: "IA con propósito",
-    text: "Uso modelos locales, asistentes y automatización para resolver tareas concretas, no como una capa decorativa del producto.",
+    title: "IA con límites claros",
+    text: "Modelos que citan sus fuentes, se abstienen sin evidencia o corren localmente cuando la privacidad importa.",
   },
 ];
 
+function Timeline({ items, label, icon: Icon }: { items: TimelineItem[]; label: string; icon: typeof Briefcase }) {
+  return (
+    <div>
+      <h3 className="flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.16em] text-muted">
+        <Icon size={15} className="text-cyan-soft" aria-hidden="true" />
+        {label}
+      </h3>
+      <ol className="mt-5 space-y-0">
+        {items.map((item) => (
+          <li key={`${item.organization}-${item.title}`} className="relative border-l border-line pb-6 pl-5 last:pb-0">
+            <span className="absolute -left-[4.5px] top-1.5 size-2 rounded-full border border-cyan/60 bg-bg" aria-hidden="true" />
+            <p className="font-mono text-[0.72rem] text-cyan-soft/80">{item.period}</p>
+            <p className="mt-1 font-medium text-ink">{item.title}</p>
+            <p className="text-sm text-ink-soft">{item.organization}</p>
+            {item.detail ? <p className="mt-2 max-w-prose text-sm leading-relaxed text-muted">{item.detail}</p> : null}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 export default function About() {
   return (
-    <AnimatedSection id="about" className="cv-auto mx-auto w-full max-w-[92rem] px-4 py-20 sm:px-6 lg:px-8">
-      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start xl:grid-cols-12">
-        <div className="xl:col-span-5">
-          <p className="text-sm font-semibold text-emerald-200">Sobre mí</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-            Desarrollo software útil para problemas que necesitan orden, automatización y continuidad.
-          </h2>
-        </div>
+    <section id="about" aria-labelledby="about-title" className="relative py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader
+          id="about-title"
+          index="01"
+          eyebrow="Perfil"
+          title={
+            <>
+              Ingeniero en Informática que construye <span className="gradient-text">software útil</span> para problemas
+              reales.
+            </>
+          }
+        />
 
-        <div className="max-w-3xl space-y-6 text-base leading-8 text-zinc-300 xl:col-span-7 xl:ml-auto">
-          <p>
-            Soy Sergio Enrique Carey Alegre, Ingeniero Informático formado en Inacap. Mi trabajo combina backend con Python/Django y Java/Spring Boot, bases de datos, automatización, IA aplicada y desarrollo de productos web y de escritorio.
-          </p>
-          <p>
-            Me interesa convertir necesidades reales en sistemas mantenibles: desde plataformas operativas y proyectos de datos hasta asistentes locales, integraciones de APIs y herramientas de productividad.
-          </p>
-        </div>
-      </div>
+        <div className="mt-14 grid gap-12 lg:grid-cols-12">
+          <div className="reveal space-y-5 text-[1.0625rem] leading-relaxed text-ink-soft lg:col-span-7">
+            <p>
+              Soy Sergio Enrique Carey Alegre, Ingeniero en Informática titulado en INACAP y Técnico Analista Programador.
+              Vivo en Arica, Chile, y desarrollo software con foco en backend, inteligencia artificial aplicada y
+              automatización.
+            </p>
+            <p>
+              Hoy desarrollo un sistema Django en operación para la gestión de pedidos de una lavandería. Antes construí
+              chatbots con herramientas de IA en Python y, en paralelo, proyectos propios: un asistente RAG con fuentes
+              trazables, una aplicación de escritorio con modelos locales y backends en Java y Spring Boot.
+            </p>
+            <p>
+              Me gusta el trabajo que deja procesos más claros que antes: modelos de datos ordenados, flujos explícitos y
+              herramientas que el equipo puede mantener.
+            </p>
 
-      <div className="premium-surface mt-12 rounded-lg p-5 md:p-6 xl:p-7">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-cyan-200">Perfil profesional</p>
-            <h3 className="mt-2 text-2xl font-semibold text-white">Credenciales y foco técnico</h3>
+            <ul className="grid gap-px overflow-hidden rounded-lg border border-line bg-line pt-0 sm:grid-cols-3">
+              {principles.map((principle, index) => (
+                <li key={principle.title} className="bg-bg-raised p-5">
+                  <span className="font-mono text-xs text-violet">0{index + 1}</span>
+                  <p className="mt-2 font-medium leading-snug text-ink">{principle.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{principle.text}</p>
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-zinc-400">
-            Backend, datos, IA aplicada y producto conectados por una forma de trabajo incremental y verificable.
-          </p>
+
+          <div className="hud reveal space-y-9 rounded-xl p-6 sm:p-8 lg:col-span-5">
+            <Timeline items={experience} label="Experiencia" icon={Briefcase} />
+            <div className="glow-rule" aria-hidden="true" />
+            <Timeline items={education} label="Formación" icon={GraduationCap} />
+          </div>
         </div>
-        <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {profileCredentials.map((credential) => (
-            <div key={credential.label} className="tech-chip rounded-lg p-4">
-              <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                {credential.label}
-              </dt>
-              <dd className="mt-2 text-sm font-medium leading-6 text-zinc-100">{credential.value}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
-
-      <div className="mt-12 grid gap-4 md:grid-cols-3 xl:gap-5">
-        {principles.map((principle) => {
-          const Icon = principle.icon;
-
-          return (
-            <article key={principle.title} className="premium-card rounded-lg p-5 xl:p-6">
-              <Icon size={22} className="text-cyan-200" aria-hidden="true" />
-              <h3 className="mt-4 text-lg font-semibold text-white">{principle.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-zinc-300">{principle.text}</p>
-            </article>
-          );
-        })}
-      </div>
-    </AnimatedSection>
+    </section>
   );
 }

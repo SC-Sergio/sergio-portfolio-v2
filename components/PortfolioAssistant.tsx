@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  Bot,
-  MessageCircle,
-  RotateCcw,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  X,
-} from "lucide-react";
-import { Fragment, type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { Bot, RotateCcw, Send, ShieldCheck, X } from "lucide-react";
+import { type FormEvent, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import {
   ASSISTANT_LIMITS,
   ASSISTANT_SESSION_KEY,
@@ -17,6 +9,7 @@ import {
   assistantQuickPrompts,
   blockedMessage,
   getPortfolioAssistantReply,
+  isAllowedAssistantHref,
   limitReachedMessage,
 } from "@/data/assistant";
 
@@ -33,126 +26,69 @@ type LimitState = {
   blocked: boolean;
 };
 
-const initialMessages: AssistantMessage[] = [
-  {
-    id: "assistant-initial",
-    role: "assistant",
-    content: assistantInitialMessage,
-  },
-];
+const initialMessages: AssistantMessage[] = [{ id: "assistant-initial", role: "assistant", content: assistantInitialMessage }];
+const initialLimits: LimitState = { questionsUsed: 0, outOfScopeCount: 0, blocked: false };
+const RESPONSE_DELAY_MS = 450;
 
-const initialLimits: LimitState = {
-  questionsUsed: 0,
-  outOfScopeCount: 0,
-  blocked: false,
-};
-
-const linkTokens = [
-  {
-    token: "[sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com)",
-    label: "sergiocareyhola@gmail.com",
-    href: "mailto:sergiocareyhola@gmail.com",
-  },
-  {
-    token: "https://github.com/SC-Sergio",
-    label: "GitHub",
-    href: "https://github.com/SC-Sergio",
-  },
-  {
-    token: "https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/",
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/",
-  },
-];
-
-function isStoredLimitState(value: unknown): value is LimitState {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const candidate = value as Partial<LimitState>;
-  return (
-    typeof candidate.questionsUsed === "number" &&
-    typeof candidate.outOfScopeCount === "number" &&
-    typeof candidate.blocked === "boolean"
-  );
-}
-
-function readStoredLimitState(): LimitState {
+function readStoredLimits(): LimitState {
   try {
-    if (typeof window === "undefined") {
+    const raw = sessionStorage.getItem(ASSISTANT_SESSION_KEY);
+    if (!raw) return initialLimits;
+    const value = JSON.parse(raw) as Partial<LimitState>;
+    if (typeof value.questionsUsed !== "number" || typeof value.outOfScopeCount !== "number" || typeof value.blocked !== "boolean") {
       return initialLimits;
     }
-
-    const storedLimits = sessionStorage.getItem(ASSISTANT_SESSION_KEY);
-
-    if (!storedLimits) {
-      return initialLimits;
-    }
-
-    const parsedLimits: unknown = JSON.parse(storedLimits);
-
-    if (!isStoredLimitState(parsedLimits)) {
-      return initialLimits;
-    }
-
     return {
-      questionsUsed: Math.min(parsedLimits.questionsUsed, ASSISTANT_LIMITS.maxQuestions),
-      outOfScopeCount: Math.min(
-        parsedLimits.outOfScopeCount,
-        ASSISTANT_LIMITS.maxOutOfScope,
-      ),
-      blocked: parsedLimits.blocked,
+      questionsUsed: Math.min(Math.max(value.questionsUsed, 0), ASSISTANT_LIMITS.maxQuestions),
+      outOfScopeCount: Math.min(Math.max(value.outOfScopeCount, 0), ASSISTANT_LIMITS.maxOutOfScope),
+      blocked: value.blocked,
     };
   } catch {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem(ASSISTANT_SESSION_KEY);
-    }
-
     return initialLimits;
   }
 }
 
-function renderLinkedText(content: string): ReactNode {
-  let parts: ReactNode[] = [content];
+function storeLimits(limits: LimitState) {
+  try {
+    sessionStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify(limits));
+  } catch {
+    /* almacenamiento no disponible (modo privado): los límites viven solo en memoria */
+  }
+}
 
-  linkTokens.forEach(({ token, label, href }) => {
-    parts = parts.flatMap((part, index) => {
-      if (typeof part !== "string" || !part.includes(token)) {
-        return [part];
-      }
+/** Convierte [texto](href) en enlaces solo si el destino está permitido; si no, deja el texto. */
+function renderMessage(content: string, onInternalLink: () => void): ReactNode[] {
+  const parts: ReactNode[] = [];
+  const pattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
 
-      const segments = part.split(token);
-      return segments.flatMap((segment, segmentIndex) => {
-        const output: ReactNode[] = [];
+  while ((match = pattern.exec(content)) !== null) {
+    const [full, label, href] = match;
+    if (match.index > lastIndex) parts.push(content.slice(lastIndex, match.index));
 
-        if (segment) {
-          output.push(
-            <Fragment key={`${token}-text-${index}-${segmentIndex}`}>
-              {segment}
-            </Fragment>,
-          );
-        }
+    if (isAllowedAssistantHref(href)) {
+      const external = href.startsWith("http");
+      const internal = href.startsWith("#");
+      parts.push(
+        <a
+          key={`${href}-${match.index}`}
+          href={href}
+          {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          onClick={internal ? onInternalLink : undefined}
+          className="font-medium text-cyan-soft underline decoration-cyan/40 underline-offset-4 hover:text-white"
+        >
+          {label}
+        </a>,
+      );
+    } else {
+      parts.push(label);
+    }
 
-        if (segmentIndex < segments.length - 1) {
-          output.push(
-            <a
-              key={`${token}-link-${index}-${segmentIndex}`}
-              href={href}
-              target={href.startsWith("http") ? "_blank" : undefined}
-              rel={href.startsWith("http") ? "noreferrer" : undefined}
-              className="font-medium text-cyan-200 underline decoration-cyan-300/50 underline-offset-4 transition-colors hover:text-white"
-            >
-              {label}
-            </a>,
-          );
-        }
+    lastIndex = match.index + full.length;
+  }
 
-        return output;
-      });
-    });
-  });
-
+  if (lastIndex < content.length) parts.push(content.slice(lastIndex));
   return parts;
 }
 
@@ -164,168 +100,125 @@ export default function PortfolioAssistant() {
   const [isTyping, setIsTyping] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
   const messageIdRef = useRef(0);
   const lastQuestionAtRef = useRef(Number.NEGATIVE_INFINITY);
-  const hasLoadedSessionRef = useRef(false);
-  const responseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadedRef = useRef(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (!hasLoadedSessionRef.current) {
-      return;
-    }
-
-    sessionStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify(limits));
-  }, [limits]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isOpen) {
-      window.setTimeout(() => inputRef.current?.focus(), 80);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ block: "end" });
-  }, [messages, isTyping, isOpen]);
-
-  useEffect(() => {
-    return () => {
-      if (responseTimerRef.current) {
-        clearTimeout(responseTimerRef.current);
-      }
-    };
+  const close = useCallback((restoreFocus: boolean) => {
+    setIsOpen(false);
+    if (restoreFocus) toggleRef.current?.focus();
   }, []);
 
-  const nextMessageId = (prefix: string) => {
+  // Al seguir un enlace interno (#projects, /cv) el panel se cierra para mostrar el destino.
+  const closeOnInternalLink = useCallback(() => setIsOpen(false), []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close(true);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    inputRef.current?.focus({ preventScroll: true });
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, close]);
+
+  useEffect(() => {
+    const log = logRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
+  }, [messages, isTyping, isOpen]);
+
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
+
+  const updateLimits = (next: LimitState) => {
+    setLimits(next);
+    storeLimits(next);
+  };
+
+  const nextId = (prefix: string) => {
     messageIdRef.current += 1;
     return `${prefix}-${messageIdRef.current}`;
   };
 
-  const appendAssistantMessage = (content: string, tone: AssistantMessage["tone"] = "default") => {
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      {
-        id: nextMessageId("assistant"),
-        role: "assistant",
-        content,
-        tone,
-      },
-    ]);
+  const appendAssistant = (content: string, tone: AssistantMessage["tone"] = "default") => {
+    setMessages((current) => [...current, { id: nextId("assistant"), role: "assistant", content, tone }]);
+  };
+
+  const toggle = () => {
+    if (!isOpen && !loadedRef.current) {
+      loadedRef.current = true;
+      setLimits(readStoredLimits());
+    }
+    if (isOpen) {
+      close(false);
+    } else {
+      setIsOpen(true);
+    }
   };
 
   const resetChat = () => {
-    if (responseTimerRef.current) {
-      clearTimeout(responseTimerRef.current);
-    }
-
+    if (timerRef.current) clearTimeout(timerRef.current);
     setMessages(initialMessages);
-    setLimits(initialLimits);
+    updateLimits(initialLimits);
     setInput("");
     setNotice(null);
     setIsTyping(false);
     lastQuestionAtRef.current = Number.NEGATIVE_INFINITY;
-    hasLoadedSessionRef.current = true;
-    sessionStorage.removeItem(ASSISTANT_SESSION_KEY);
-    window.setTimeout(() => inputRef.current?.focus(), 80);
-  };
-
-  const toggleAssistant = () => {
-    if (!isOpen && !hasLoadedSessionRef.current) {
-      setLimits(readStoredLimitState());
-      hasLoadedSessionRef.current = true;
-    }
-
-    setIsOpen((currentValue) => !currentValue);
+    inputRef.current?.focus();
   };
 
   const submitQuestion = (rawQuestion: string, eventTime: number) => {
     const question = rawQuestion.trim();
-
-    if (!question || isTyping) {
-      return;
-    }
+    if (!question || isTyping) return;
 
     if (question.length > ASSISTANT_LIMITS.maxCharacters) {
-      setNotice("Tu pregunta supera los 280 caracteres. Acórtala para mantener esta demo liviana.");
+      setNotice(`La pregunta supera los ${ASSISTANT_LIMITS.maxCharacters} caracteres. Acórtala, por favor.`);
       return;
     }
-
     if (limits.blocked) {
-      setNotice("El chat está pausado por seguridad. Usa “Reiniciar chat” para volver al contexto del portafolio.");
-      appendAssistantMessage(blockedMessage, "error");
+      setNotice("El chat está pausado. Usa «Reiniciar chat» para continuar.");
       return;
     }
-
     if (limits.questionsUsed >= ASSISTANT_LIMITS.maxQuestions) {
-      setNotice("Límite de preguntas alcanzado en esta sesión.");
-      appendAssistantMessage(limitReachedMessage, "warning");
+      setNotice("Llegaste al límite de preguntas de esta sesión.");
+      appendAssistant(limitReachedMessage, "warning");
       return;
     }
-
-    const now = eventTime;
-    if (now - lastQuestionAtRef.current < ASSISTANT_LIMITS.cooldownMs) {
+    if (eventTime - lastQuestionAtRef.current < ASSISTANT_LIMITS.cooldownMs) {
       setNotice("Espera un momento antes de enviar otra pregunta.");
       return;
     }
 
     setNotice(null);
     setInput("");
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      {
-        id: nextMessageId("user"),
-        role: "user",
-        content: question,
-      },
-    ]);
+    setMessages((current) => [...current, { id: nextId("user"), role: "user", content: question }]);
 
     const reply = getPortfolioAssistantReply(question);
-    const nextLimits: LimitState = {
-      ...limits,
-      questionsUsed: limits.questionsUsed + 1,
-    };
-
-    let finalReply = reply.text;
-    let finalTone: AssistantMessage["tone"] =
-      reply.status === "out-of-scope" ? "warning" : "default";
+    const next: LimitState = { ...limits, questionsUsed: limits.questionsUsed + 1 };
+    let text = reply.text;
+    let tone: AssistantMessage["tone"] = reply.status === "out-of-scope" ? "warning" : "default";
 
     if (reply.status === "out-of-scope") {
-      const nextOutOfScopeCount = limits.outOfScopeCount + 1;
-      nextLimits.outOfScopeCount = Math.min(
-        nextOutOfScopeCount,
-        ASSISTANT_LIMITS.maxOutOfScope,
-      );
-
-      if (nextOutOfScopeCount > ASSISTANT_LIMITS.maxOutOfScope) {
-        nextLimits.blocked = true;
-        finalReply = blockedMessage;
-        finalTone = "error";
+      const count = limits.outOfScopeCount + 1;
+      next.outOfScopeCount = Math.min(count, ASSISTANT_LIMITS.maxOutOfScope);
+      if (count > ASSISTANT_LIMITS.maxOutOfScope) {
+        next.blocked = true;
+        text = blockedMessage;
+        tone = "error";
       }
     }
 
-    setLimits(nextLimits);
-    lastQuestionAtRef.current = now;
+    updateLimits(next);
+    lastQuestionAtRef.current = eventTime;
     setIsTyping(true);
-
-    responseTimerRef.current = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setIsTyping(false);
-      appendAssistantMessage(finalReply, finalTone);
-    }, 520);
+      appendAssistant(text, tone);
+    }, RESPONSE_DELAY_MS);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -333,91 +226,76 @@ export default function PortfolioAssistant() {
     submitQuestion(input, event.timeStamp);
   };
 
-  const remainingQuestions = ASSISTANT_LIMITS.maxQuestions - limits.questionsUsed;
-  const isInputDisabled = isTyping || limits.blocked;
+  const remaining = Math.max(ASSISTANT_LIMITS.maxQuestions - limits.questionsUsed, 0);
+  const disabled = isTyping || limits.blocked;
 
   return (
-    <div className="pointer-events-none fixed inset-x-4 bottom-4 z-50 flex flex-col items-end sm:left-auto">
+    <div className="pointer-events-none fixed inset-x-3 bottom-3 z-40 flex flex-col items-end sm:inset-x-auto sm:bottom-5 sm:right-5">
       {isOpen ? (
         <section
-          aria-labelledby="portfolio-assistant-title"
-          aria-modal="false"
+          id="portfolio-assistant"
           role="dialog"
-          className="pointer-events-auto mb-3 flex max-h-[calc(100svh-6rem)] w-full max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-cyan-100/20 bg-[#061014]/95 shadow-2xl shadow-black/70 ring-1 ring-white/10 backdrop-blur-md sm:w-[26rem]"
+          aria-modal="false"
+          aria-labelledby="portfolio-assistant-title"
+          className="pointer-events-auto mb-3 flex max-h-[min(36rem,calc(100svh-10rem))] w-full flex-col overflow-hidden rounded-2xl border border-line-strong bg-[#070b12] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.85)] sm:w-[25rem]"
         >
-          <header className="flex items-start justify-between gap-4 border-b border-cyan-100/15 bg-slate-950/75 p-4">
+          <header className="flex items-start justify-between gap-4 border-b border-line px-4 py-3.5">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
-                <Sparkles aria-hidden="true" size={14} />
-                Demo local
-              </div>
-              <h2 id="portfolio-assistant-title" className="mt-1 text-base font-semibold text-white">
+              <h2 id="portfolio-assistant-title" className="flex items-center gap-2 font-display text-base font-semibold text-ink">
+                <Bot size={17} className="text-cyan-soft" aria-hidden="true" />
                 Asistente del portafolio
               </h2>
-              <p className="mt-1 text-xs leading-relaxed text-slate-200">
-                Respuestas controladas sobre perfil, proyectos, stack y contacto.
-              </p>
+              <p className="mt-0.5 text-xs text-muted">Respuestas locales y verificadas. No usa APIs externas.</p>
             </div>
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
-              className="rounded-full border border-cyan-100/20 bg-slate-900/90 p-2 text-slate-100 transition-colors hover:border-cyan-200/55 hover:bg-cyan-200/15"
-              aria-label="Cerrar panel del asistente"
-              title="Cerrar"
+              onClick={() => close(true)}
+              className="grid size-9 shrink-0 place-items-center rounded-lg border border-line text-ink-soft transition-colors hover:bg-white/5 hover:text-ink"
+              aria-label="Cerrar asistente"
             >
-              <X aria-hidden="true" size={18} />
+              <X size={17} aria-hidden="true" />
             </button>
           </header>
 
-          <div
-            className="min-h-0 flex-1 space-y-3 overflow-y-auto border-y border-white/[0.04] bg-[#03080b]/70 px-4 py-4"
-            aria-live="polite"
-          >
+          <div ref={logRef} role="log" aria-live="polite" aria-label="Conversación" className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
             {messages.map((message) => {
               const isUser = message.role === "user";
-              const toneClass =
+              const tone =
                 message.tone === "error"
-                  ? "border-red-300/45 bg-red-950/80 text-red-50 shadow-sm shadow-black/30"
+                  ? "border-red-400/40 bg-red-950/60 text-red-50"
                   : message.tone === "warning"
-                    ? "border-amber-300/45 bg-amber-950/75 text-amber-50 shadow-sm shadow-black/30"
+                    ? "border-amber-300/40 bg-amber-950/50 text-amber-50"
                     : isUser
-                      ? "border-emerald-200/45 bg-emerald-400/15 text-white shadow-sm shadow-black/30"
-                      : "border-cyan-100/25 bg-slate-900/85 text-slate-100 shadow-sm shadow-black/30";
-
+                      ? "border-cyan/35 bg-cyan/10 text-ink"
+                      : "border-line bg-surface-2 text-ink-soft";
               return (
-                <div
-                  key={message.id}
-                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[86%] break-words rounded-2xl border px-3.5 py-2.5 text-sm leading-relaxed ${toneClass}`}
-                  >
-                    {renderLinkedText(message.content)}
-                  </div>
+                <div key={message.id} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+                  <p className={`max-w-[88%] break-words rounded-2xl border px-3.5 py-2.5 text-sm leading-relaxed ${tone}`} data-role={message.role}>
+                    <span className="sr-only">{isUser ? "Tú: " : "Asistente: "}</span>
+                    {renderMessage(message.content, closeOnInternalLink)}
+                  </p>
                 </div>
               );
             })}
-
             {isTyping ? (
               <div className="flex justify-start">
-                <div className="flex items-center gap-2 rounded-2xl border border-cyan-100/25 bg-slate-900/85 px-3.5 py-2.5 text-sm text-slate-100 shadow-sm shadow-black/30">
-                  <span className="h-2 w-2 rounded-full bg-cyan-200 shadow-[0_0_12px_rgba(103,232,249,0.65)]" />
-                  Escribiendo respuesta demo...
-                </div>
+                <p className="flex items-center gap-2 rounded-2xl border border-line bg-surface-2 px-3.5 py-2.5 text-sm text-muted">
+                  <span className="size-1.5 animate-pulse rounded-full bg-cyan motion-reduce:animate-none" aria-hidden="true" />
+                  Escribiendo…
+                </p>
               </div>
             ) : null}
-            <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-cyan-100/15 bg-slate-950/75 p-4">
-            <div className="mb-3 flex flex-wrap gap-2">
+          <div className="border-t border-line px-4 pb-4 pt-3">
+            <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible" aria-label="Preguntas sugeridas" role="group">
               {assistantQuickPrompts.map((prompt) => (
                 <button
                   key={prompt}
                   type="button"
                   onClick={(event) => submitQuestion(prompt, event.timeStamp)}
-                  disabled={isInputDisabled}
-                  className="rounded-full border border-cyan-100/18 bg-slate-900/85 px-3 py-1.5 text-left text-xs font-medium text-slate-100 shadow-sm shadow-black/20 transition-colors hover:border-cyan-200/45 hover:bg-cyan-200/12 disabled:cursor-not-allowed disabled:opacity-45"
+                  disabled={disabled}
+                  className="shrink-0 rounded-full border border-line bg-white/[0.03] px-3 py-1.5 text-xs text-ink-soft transition-colors hover:border-cyan/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {prompt}
                 </button>
@@ -426,56 +304,48 @@ export default function PortfolioAssistant() {
 
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
               <label htmlFor="portfolio-assistant-input" className="sr-only">
-                Pregunta para el asistente del portafolio
+                Pregunta para el asistente
               </label>
               <input
                 ref={inputRef}
                 id="portfolio-assistant-input"
                 type="text"
                 value={input}
+                autoComplete="off"
+                enterKeyHint="send"
                 onChange={(event) => {
                   setInput(event.target.value);
-                  if (notice) {
-                    setNotice(null);
-                  }
+                  if (notice) setNotice(null);
                 }}
                 maxLength={ASSISTANT_LIMITS.maxCharacters + 40}
-                disabled={isInputDisabled}
-                placeholder={
-                  limits.blocked
-                    ? "Reinicia el chat para continuar"
-                    : "Pregunta sobre Sergio"
-                }
-                className="min-w-0 flex-1 rounded-full border border-cyan-100/20 bg-slate-950/95 px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-slate-400 focus:border-cyan-200/70 focus:bg-slate-950 disabled:cursor-not-allowed disabled:opacity-55"
+                disabled={disabled}
+                placeholder={limits.blocked ? "Reinicia el chat para continuar" : "Pregunta sobre Sergio…"}
+                className="h-11 min-w-0 flex-1 rounded-xl border border-line-strong bg-bg px-3.5 text-base text-ink outline-none transition-colors placeholder:text-muted focus:border-cyan/60 disabled:cursor-not-allowed disabled:opacity-55 sm:text-sm"
               />
               <button
                 type="submit"
-                disabled={!input.trim() || isInputDisabled}
-                className="rounded-full border border-emerald-200/45 bg-emerald-300/20 p-2.5 text-emerald-50 shadow-sm shadow-emerald-950/40 transition-colors hover:border-emerald-200/70 hover:bg-emerald-300/30 disabled:cursor-not-allowed disabled:opacity-45"
-                aria-label="Enviar pregunta al asistente"
-                title="Enviar"
+                disabled={!input.trim() || disabled}
+                className="grid size-11 shrink-0 place-items-center rounded-xl bg-cyan text-[#021014] transition-colors hover:bg-cyan-soft disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Enviar pregunta"
               >
-                <Send aria-hidden="true" size={18} />
+                <Send size={17} aria-hidden="true" />
               </button>
             </form>
 
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck aria-hidden="true" size={14} />
-                {limits.blocked
-                  ? "Chat pausado"
-                  : `${Math.max(remainingQuestions, 0)}/${ASSISTANT_LIMITS.maxQuestions} preguntas disponibles`}
+            <div className="mt-3 flex items-center justify-between gap-2 text-xs text-muted">
+              <span className="inline-flex items-center gap-1.5" data-testid="assistant-remaining">
+                <ShieldCheck size={13} aria-hidden="true" />
+                {limits.blocked ? "Chat pausado" : `${remaining}/${ASSISTANT_LIMITS.maxQuestions} preguntas disponibles`}
               </span>
               <button
                 type="button"
                 onClick={resetChat}
-                className="inline-flex items-center gap-1.5 rounded-full px-2 py-1 font-medium text-cyan-100 transition-colors hover:bg-cyan-200/12 hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium text-cyan-soft transition-colors hover:bg-white/5 hover:text-ink"
               >
-                <RotateCcw aria-hidden="true" size={13} />
+                <RotateCcw size={12} aria-hidden="true" />
                 Reiniciar chat
               </button>
             </div>
-
             {notice ? (
               <p className="mt-2 text-xs leading-relaxed text-amber-200" role="alert">
                 {notice}
@@ -486,15 +356,16 @@ export default function PortfolioAssistant() {
       ) : null}
 
       <button
+        ref={toggleRef}
         type="button"
-        onClick={toggleAssistant}
-        className="glow-button pointer-events-auto inline-flex items-center gap-2 rounded-full border border-emerald-100/50 bg-emerald-300 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/30 transition-transform hover:-translate-y-0.5 hover:bg-emerald-200"
-        aria-label={isOpen ? "Cerrar asistente del portafolio" : "Abrir asistente del portafolio"}
+        onClick={toggle}
         aria-expanded={isOpen}
+        aria-controls={isOpen ? "portfolio-assistant" : undefined}
+        aria-label={isOpen ? "Cerrar asistente del portafolio" : "Abrir asistente del portafolio"}
+        className="pointer-events-auto inline-flex h-12 items-center gap-2 rounded-full border border-cyan/40 bg-[#081018] px-4 text-sm font-semibold text-ink shadow-[0_12px_40px_-10px_rgba(34,211,238,0.45)] transition-colors hover:border-cyan/70"
       >
-        {isOpen ? <X aria-hidden="true" size={18} /> : <MessageCircle aria-hidden="true" size={18} />}
+        {isOpen ? <X size={18} aria-hidden="true" /> : <Bot size={18} className="text-cyan-soft" aria-hidden="true" />}
         <span className="hidden sm:inline">{isOpen ? "Cerrar" : "Asistente"}</span>
-        <Bot aria-hidden="true" className="sm:hidden" size={18} />
       </button>
     </div>
   );

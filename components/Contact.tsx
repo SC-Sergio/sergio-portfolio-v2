@@ -1,103 +1,81 @@
-import { ArrowUpRight, Mail, MessageSquareText } from "lucide-react";
-import AnimatedSection from "@/components/AnimatedSection";
+import { ArrowUpRight, FileText, Mail } from "lucide-react";
+import CopyEmailButton from "@/components/CopyEmailButton";
+import { GitHubIcon, LinkedInIcon } from "@/components/icons";
+import { mailtoHref, profile } from "@/data/profile";
 
-const email = "sergiocareyhola@gmail.com";
-const mailHref = `mailto:${email}?subject=Consulta%20desde%20tu%20portafolio`;
-const contactLinks = [
-  {
-    href: "https://github.com/SC-Sergio",
-    label: "GitHub",
-    ariaLabel: "Abrir GitHub de Sergio Carey",
-    icon: ArrowUpRight,
-  },
-  {
-    href: "https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/",
-    label: "LinkedIn",
-    ariaLabel: "Abrir LinkedIn de Sergio Carey",
-    icon: ArrowUpRight,
-  },
+const channels = [
+  { label: "GitHub", value: `@${profile.githubHandle}`, href: profile.github, icon: GitHubIcon, external: true },
+  { label: "LinkedIn", value: "Sergio Enrique Carey Alegre", href: profile.linkedin, icon: LinkedInIcon, external: true },
+  { label: "CV", value: "Versión imprimible", href: "/cv", icon: FileText, external: false },
 ];
 
 export default function Contact() {
   return (
-    <AnimatedSection id="contact" className="cv-auto mx-auto w-full max-w-[86rem] px-4 py-20 sm:px-6 lg:px-8">
-      <div className="premium-surface grid gap-8 rounded-lg p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8 xl:gap-10">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold text-emerald-200">Contacto</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-            Conversemos sobre el sistema, bot o automatización que quieres construir.
-          </h2>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-300">
-            Puedo ayudarte a definir alcance, priorizar una primera versión y convertir una operación manual en una herramienta digital estable.
-          </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="tech-chip rounded-lg p-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Contacto profesional</p>
-              <p className="mt-2 text-sm font-medium text-zinc-100">Sergio Enrique Carey Alegre</p>
-            </div>
-            <div className="tech-chip rounded-lg p-4">
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Base</p>
-              <p className="mt-2 text-sm font-medium text-zinc-100">Arica, Chile · Inacap</p>
-            </div>
-          </div>
-        </div>
+    <section id="contact" aria-labelledby="contact-title" className="relative py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="hud reveal relative overflow-hidden rounded-2xl px-5 py-12 sm:px-12 sm:py-16">
+          <div className="grid-bg pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
+          <div
+            className="pointer-events-none absolute -bottom-32 left-1/2 h-64 w-[42rem] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(34,211,238,0.16),transparent_70%)]"
+            aria-hidden="true"
+          />
 
-        <div className="flex flex-col justify-between gap-6 border-t border-white/10 pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Mail size={20} className="mt-1 text-cyan-200" aria-hidden="true" />
-              <div>
-                <h3 className="font-semibold text-white">Correo directo</h3>
-                <p className="mt-1 text-sm leading-6 text-zinc-400">
-                  Ideal para proyectos, soporte y propuestas de automatización.
-                </p>
-                <a
-                  href={mailHref}
-                  className="mt-2 inline-flex text-sm font-medium text-emerald-100 underline decoration-emerald-300/50 transition-colors hover:text-white"
-                >
-                  {email}
+          <div className="relative grid gap-12 lg:grid-cols-12 lg:items-end">
+            <div className="min-w-0 lg:col-span-7">
+              <p className="eyebrow flex items-center gap-3">
+                <span className="text-muted">05</span>
+                <span className="h-px w-8 bg-gradient-to-r from-cyan to-transparent" aria-hidden="true" />
+                Contacto
+              </p>
+              <h2 id="contact-title" className="mt-4 font-display text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink">
+                ¿Tienes un proceso que <span className="gradient-text">automatizar</span> o un sistema que construir?
+              </h2>
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
+                Escríbeme con el contexto del problema. Respondo por correo y podemos seguir por la vía que te acomode.
+              </p>
+
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <a href={mailtoHref} className="btn btn-primary">
+                  <Mail size={16} aria-hidden="true" />
+                  Escribir un correo
                 </a>
+                <CopyEmailButton email={profile.email} />
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <MessageSquareText size={20} className="mt-1 text-amber-200" aria-hidden="true" />
-              <div>
-                <h3 className="font-semibold text-white">Primer diagnóstico</h3>
-                <p className="mt-1 text-sm leading-6 text-zinc-400">Reviso el flujo actual y propongo un camino simple para avanzar.</p>
-              </div>
-            </div>
-          </div>
-
-          <address className="flex flex-wrap gap-2 not-italic" aria-label="Perfiles de contacto">
-            {contactLinks.map((link) => {
-              const Icon = link.icon;
-
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  aria-label={link.ariaLabel}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="tech-chip inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium text-zinc-200 transition-colors hover:border-cyan-200/40 hover:bg-white/[0.08] hover:text-white"
-                >
-                  <Icon size={16} aria-hidden="true" />
-                  {link.label}
+              <p className="mt-4 font-mono text-sm text-ink-soft">
+                <a href={mailtoHref} className="break-all underline decoration-line-strong underline-offset-4 hover:text-ink">
+                  {profile.email}
                 </a>
-              );
-            })}
-          </address>
+              </p>
+            </div>
 
-          <a
-            href={mailHref}
-            aria-label={`Enviar correo a ${email}`}
-            className="glow-button inline-flex h-12 items-center justify-center gap-2 rounded-md bg-emerald-300 px-5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
-          >
-            Enviar correo
-            <ArrowUpRight size={17} aria-hidden="true" />
-          </a>
+            <ul className="min-w-0 space-y-2 lg:col-span-5">
+              {channels.map((channel) => {
+                const Icon = channel.icon;
+                return (
+                  <li key={channel.label}>
+                    <a
+                      href={channel.href}
+                      {...(channel.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      className="group flex items-center gap-4 rounded-xl border border-line bg-bg/70 px-4 py-3.5 transition-colors hover:border-cyan/40"
+                    >
+                      <span className="grid size-10 place-items-center rounded-lg border border-line text-ink-soft group-hover:text-cyan-soft">
+                        <Icon size={18} aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium text-ink">{channel.label}</span>
+                        <span className="block truncate text-sm text-muted">{channel.value}</span>
+                      </span>
+                      <ArrowUpRight size={16} className="text-muted transition-colors group-hover:text-cyan-soft" aria-hidden="true" />
+                      {channel.external ? <span className="sr-only">(se abre en una pestaña nueva)</span> : null}
+                    </a>
+                  </li>
+                );
+              })}
+              <li className="px-1 pt-2 font-mono text-xs text-muted">Base: {profile.location} · abierto a trabajo remoto</li>
+            </ul>
+          </div>
         </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }

@@ -1,14 +1,20 @@
+// Asistente local y determinista del portafolio: sin API externa ni almacenamiento
+// remoto. Clasifica la intención por términos normalizados (con raíces para cubrir
+// conjugaciones como "contactarlo") y responde solo sobre el perfil profesional.
+
+import { profile } from "@/data/profile";
+
 export const ASSISTANT_LIMITS = {
-  maxQuestions: 8,
+  maxQuestions: 10,
   maxCharacters: 280,
-  cooldownMs: 1500,
+  cooldownMs: 1200,
   maxOutOfScope: 2,
 } as const;
 
 export const ASSISTANT_SESSION_KEY = "sergio-portfolio-assistant-limits";
 
 export const assistantInitialMessage =
-  "Hola, soy el asistente demo del portafolio de Sergio. Puedo responder sobre su perfil, proyectos, stack, servicios y contacto.";
+  "Hola, soy el asistente del portafolio de Sergio. Respondo sobre su perfil, experiencia, proyectos, tecnologías, servicios y contacto.";
 
 export const assistantQuickPrompts = [
   "¿Quién es Sergio Carey?",
@@ -18,263 +24,202 @@ export const assistantQuickPrompts = [
   "¿Cómo puedo contactarlo?",
 ] as const;
 
-export const outOfScopeMessage =
-  "Soy un asistente demo local del portafolio de Sergio Carey. Puedo responder sobre sus proyectos, tecnologías, servicios y contacto. Para otro tema, puedes escribirle directamente a [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com).";
+const emailLink = `[${profile.email}](mailto:${profile.email})`;
 
-export const limitReachedMessage =
-  "Llegaste al límite de 8 preguntas de esta demo local. Para continuar la conversación, puedes escribirle directamente a [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com).";
+export const outOfScopeMessage = `Solo puedo responder sobre el perfil profesional de Sergio: experiencia, proyectos, tecnologías, servicios y contacto. Para otro tema puedes escribirle a ${emailLink}.`;
+
+export const limitReachedMessage = `Llegaste al límite de ${ASSISTANT_LIMITS.maxQuestions} preguntas de esta sesión. Para seguir conversando, escríbele directamente a ${emailLink}.`;
 
 export const blockedMessage =
-  "Por seguridad, pausé esta conversación porque recibió varias preguntas fuera del portafolio. Puedes reiniciar el chat para volver a consultar sobre Sergio, sus proyectos, tecnologías, servicios o contacto.";
+  "Pausé la conversación porque recibió varias preguntas fuera del portafolio. Usa «Reiniciar chat» para volver a consultar sobre Sergio.";
+
+export type AssistantIntent =
+  | "blocked"
+  | "pricing"
+  | "contact"
+  | "cv"
+  | "pegasus"
+  | "carey-assistant"
+  | "fastlaundry"
+  | "spacex"
+  | "literalura"
+  | "forohub"
+  | "experience"
+  | "education"
+  | "projects"
+  | "stack"
+  | "services"
+  | "profile"
+  | "assistant"
+  | "greeting"
+  | "out-of-scope";
 
 export type AssistantReply = {
   text: string;
-  status: "answer" | "out-of-scope" | "blocked";
+  status: "answer" | "out-of-scope";
+  intent: AssistantIntent;
 };
 
-const contactText =
-  "Puedes contactar a Sergio por correo en [sergiocareyhola@gmail.com](mailto:sergiocareyhola@gmail.com). También está en GitHub: https://github.com/SC-Sergio y LinkedIn: https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/.";
-
-const normalize = (value: string) =>
-  value
+export function normalize(value: string): string {
+  return value
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-const includesAny = (text: string, terms: string[]) =>
-  terms.some((term) => text.includes(term));
+function tokenize(text: string): string[] {
+  return text.split(/[^a-z0-9+#]+/).filter(Boolean);
+}
 
-const disallowedTerms = [
-  "api key",
-  "apikey",
-  "clave api",
-  "token",
-  "secreto",
-  "prompt interno",
-  "revela tu prompt",
-  "ignora tus instrucciones",
-  "ignora las instrucciones",
-  "jailbreak",
-  "hack",
-  "hackear",
-  "malware",
-  "phishing",
-  "explotar vulnerabilidad",
-  "politica",
-  "politico",
-  "medico",
-  "salud",
-  "legal",
-  "abogado",
-  "financiero",
-  "inversion",
-  "credito",
-  "prestamo",
+/**
+ * Un término puede ser una frase ("carey assistant", se busca como subcadena),
+ * una raíz terminada en "*" ("contact*", prefijo de una palabra) o una palabra
+ * exacta ("ia"). Así "ia" no coincide con "historia".
+ */
+function matches(text: string, tokens: string[], terms: readonly string[]): boolean {
+  return terms.some((term) => {
+    if (term.includes(" ")) return text.includes(term);
+    if (term.endsWith("*")) return tokens.some((token) => token.startsWith(term.slice(0, -1)));
+    return tokens.includes(term);
+  });
+}
+
+type IntentRule = { intent: Exclude<AssistantIntent, "out-of-scope">; terms: readonly string[]; text: string };
+
+const contactText = `Puedes escribirle a ${emailLink}. También está en [GitHub](${profile.github}) y [LinkedIn](${profile.linkedin}). La sección [Contacto](#contact) reúne todos los enlaces.`;
+
+// El orden importa: la primera regla que coincide define la respuesta.
+const rules: IntentRule[] = [
+  {
+    intent: "blocked",
+    terms: [
+      "api key", "apikey", "clave api", "api token", "token de acceso", "password*", "contrasena*", "secret*", "prompt interno",
+      "system prompt", "ignora*", "jailbreak", "hackear", "hackeo", "hacking", "malware", "phishing", "exploit*",
+      "politico*", "medico*", "medicina", "salud", "abogad*", "inversion*", "credito*", "prestamo*", "apuesta*",
+      "criptomoneda*",
+    ],
+    text: "",
+  },
+  {
+    intent: "pricing",
+    terms: ["precio*", "tarifa*", "cobra*", "cuesta", "costo*", "presupuesto*", "sueldo*", "salario*", "disponib*", "contrat*"],
+    text: `No manejo precios, disponibilidad ni compromisos comerciales. Para conversar un alcance concreto, lo mejor es escribirle directamente. ${contactText}`,
+  },
+  {
+    intent: "contact",
+    terms: [
+      "contact*", "correo*", "email*", "mail", "e-mail", "escrib*", "comunic*", "hablar", "hablemos",
+      "ubicar*", "linkedin", "github", "redes sociales",
+    ],
+    text: contactText,
+  },
+  {
+    intent: "cv",
+    terms: ["cv", "curriculum*", "resume", "hoja de vida"],
+    text: "Su CV está disponible en [/cv](/cv), en una versión imprimible con experiencia, formación, stack y proyectos verificados.",
+  },
+  {
+    intent: "pegasus",
+    terms: ["pegasus", "rag", "chromadb", "gemini", "knowledge center"],
+    text: "Pegasus Knowledge Center es un asistente RAG (Challenge final de Alura Agente) que responde sobre documentación técnica en PDF citando documento, página y fragmento. Usa Sentence Transformers, ChromaDB y Gemini, se abstiene cuando no hay evidencia relevante y tiene Docker, pytest y CI. Repositorio: [pegasus-knowledge-center](https://github.com/SC-Sergio/pegasus-knowledge-center).",
+  },
+  {
+    intent: "carey-assistant",
+    terms: ["carey assistant", "ollama", "tauri", "rust", "escritorio", "desktop", "ia local"],
+    text: "Carey Assistant es un asistente de escritorio para Windows construido con Tauri, Rust, React y TypeScript. Usa modelos locales con Ollama, recomienda e instala modelos y permite un proveedor en la nube opcional con respaldo local. El código es privado; los instaladores están en [GitHub Releases](https://github.com/SC-Sergio/carey-assistant-releases/releases).",
+  },
+  {
+    intent: "fastlaundry",
+    terms: ["fastlaundry", "fast laundry", "lavanderia*", "tupoclick"],
+    text: "FASTLAUNDRY es un sistema web en Django y PostgreSQL para gestionar los pedidos de una lavandería: órdenes, estados, caja, pagos y roles. Lo desarrolla en Tupoclick Softwares; el código es privado porque el sistema está en operación.",
+  },
+  {
+    intent: "spacex",
+    terms: ["spacex", "falcon*", "machine learning", "data science", "ciencia de datos", "scikit*", "tensorflow"],
+    text: "SpaceX Falcon 9 Landing es un notebook de ciencia de datos: SQL, mapas con Folium, dashboard con Dash y comparación de clasificadores (regresión logística, SVM, árbol de decisión, KNN y una red en Keras). Sus resultados son exploratorios. [Ver repositorio](https://github.com/SC-Sergio/SpaceX_Falcon9_Landing_Prediction).",
+  },
+  {
+    intent: "literalura",
+    terms: ["literalura", "gutendex", "libro*"],
+    text: "LiterAlura es una aplicación de consola con Java 17 y Spring Boot que consulta Gutendex y persiste libros y autores en PostgreSQL con JPA, evitando duplicados. Incluye pruebas con JUnit 5 y Mockito en GitHub Actions. [Ver repositorio](https://github.com/SC-Sergio/Challengeliteralura).",
+  },
+  {
+    intent: "forohub",
+    terms: ["forohub", "foro hub", "foro", "flyway"],
+    text: "ForoHub es un backend REST educativo con Java 17, Spring Boot, Spring Data JPA, MySQL y migraciones Flyway, organizado por capas. [Ver repositorio](https://github.com/SC-Sergio/ChallengeForoHub).",
+  },
+  {
+    intent: "experience",
+    terms: ["experiencia*", "trabaj*", "empresa*", "laboral*", "empleo*", "practica*", "vending"],
+    text: "Desde nov. 2025 desarrolla en Tupoclick Softwares un sistema Django para la gestión de pedidos de una lavandería. Antes fue desarrollador Python en Vending Store Limitada (sep. 2024 – abr. 2025), creando chatbots con herramientas de IA, donde también hizo su práctica profesional. Detalle en [/cv](/cv).",
+  },
+  {
+    intent: "education",
+    terms: ["estudi*", "formacion", "titul*", "inacap", "universidad*", "carrera", "educacion", "certific*"],
+    text: "Es Ingeniero en Informática (INACAP, 2022–2024, titulado) y Técnico de Nivel Superior Analista Programador (INACAP Arica, titulado). Además cursó la especialización en Arquitectura Cloud de INACAP y Ciberseguridad básica en Cisco Networking Academy.",
+  },
+  {
+    intent: "projects",
+    terms: ["proyecto*", "portafolio", "desarroll*", "construi*", "hecho", "repositorio*", "trabajos"],
+    text: "Proyectos destacados: Pegasus Knowledge Center (RAG con Gemini y ChromaDB), Carey Assistant (escritorio con IA local), FASTLAUNDRY (sistema Django en operación), LiterAlura y ForoHub (backend Java/Spring Boot) y SpaceX Falcon 9 (ciencia de datos). Están en la sección [Proyectos](#projects).",
+  },
+  {
+    intent: "stack",
+    terms: [
+      "tecnologia*", "stack", "lenguaje*", "herramienta*", "domina", "sabe", "python", "django", "java", "spring",
+      "postgres*", "mysql", "typescript", "react", "next*", "docker", "sql", "ia", "inteligencia artificial", "api", "apis",
+    ],
+    text: "Su stack: Python y Django; Java 17 y Spring Boot; PostgreSQL, MySQL y ChromaDB; RAG con Gemini y modelos locales con Ollama; scikit-learn y TensorFlow; TypeScript, React, Next.js y Tauri; Docker y GitHub Actions. Cada tecnología está ligada a un proyecto en [Tecnologías](#stack).",
+  },
+  {
+    intent: "services",
+    terms: ["servicio*", "ayud*", "ofrece*", "automatiz*", "chatbot*", "integracion*", "soluci*"],
+    text: "Puede ayudar con backend y sistemas web, IA aplicada (RAG, modelos locales), automatización de procesos, integraciones y APIs, bases de datos y aplicaciones de escritorio. Más detalle en [Servicios](#services).",
+  },
+  {
+    intent: "profile",
+    terms: ["perfil", "sergio", "carey", "presenta*", "sobre el", "arica"],
+    text: `${profile.fullName} (Sergio Carey) es Ingeniero en Informática titulado en INACAP, ubicado en Arica, Chile. Se enfoca en desarrollo de software con Python y Django, IA aplicada y automatización.`,
+  },
+  {
+    intent: "assistant",
+    terms: ["asistente", "bot", "eres", "funciona*", "puedes"],
+    text: "Soy un asistente local del portafolio: respondo con información predefinida y verificada, sin enviar tus preguntas a ningún servidor ni usar APIs externas.",
+  },
+  {
+    intent: "greeting",
+    terms: ["hola", "buenas", "buenos", "gracias", "saludos", "hey"],
+    text: "¡Hola! Pregúntame por la experiencia de Sergio, sus proyectos, su stack o cómo contactarlo.",
+  },
 ];
 
-const priceOrAvailabilityTerms = [
-  "precio",
-  "precios",
-  "tarifa",
-  "tarifas",
-  "cuanto cobra",
-  "cuanto cuesta",
-  "disponibilidad",
-  "disponible",
-  "contratar",
-  "sueldo",
-  "trabajo disponible",
-];
-
-const portfolioTerms = [
-  "sergio",
-  "carey",
-  "ingeniero",
-  "informatico",
-  "inacap",
-  "arica",
-  "chile",
-  "python",
-  "django",
-  "flask",
-  "java",
-  "spring boot",
-  "postgresql",
-  "mysql",
-  "typescript",
-  "react",
-  "next.js",
-  "nextjs",
-  "rust",
-  "tauri",
-  "ollama",
-  "llm",
-  "rag",
-  "machine learning",
-  "data science",
-  "inteligencia artificial",
-  "ia",
-  "automatizacion",
-  "chatbot",
-  "chatbots",
-  "api",
-  "apis",
-  "desarrollo web",
-  "fastlaundry",
-  "carey assistant",
-  "spacex",
-  "falcon 9",
-  "literalura",
-  "forohub",
-  "canchaclara",
-  "challenge encriptador",
-  "programacionavanzadainacap",
-  "programacion avanzada",
-  "proyecto",
-  "proyectos",
-  "laboratorio",
-  "stack",
-  "tecnologia",
-  "tecnologias",
-  "servicio",
-  "servicios",
-  "contacto",
-  "correo",
-  "email",
-  "github",
-  "linkedin",
-  "hablemos",
-  "asistente",
-  "bot",
-  "portafolio",
-];
+export function classifyIntent(question: string): AssistantIntent {
+  const text = normalize(question);
+  const tokens = tokenize(text);
+  return rules.find((rule) => matches(text, tokens, rule.terms))?.intent ?? "out-of-scope";
+}
 
 export function getPortfolioAssistantReply(question: string): AssistantReply {
-  const text = normalize(question);
+  const intent = classifyIntent(question);
 
-  if (includesAny(text, disallowedTerms)) {
-    return { text: outOfScopeMessage, status: "out-of-scope" };
+  if (intent === "blocked" || intent === "out-of-scope") {
+    return { text: outOfScopeMessage, status: "out-of-scope", intent };
   }
 
-  if (includesAny(text, priceOrAvailabilityTerms)) {
-    return {
-      text: `No manejo precios, disponibilidad laboral ni compromisos comerciales desde esta demo. Para conversar un alcance real, lo mejor es escribirle directamente a Sergio. ${contactText}`,
-      status: "answer",
-    };
-  }
+  const rule = rules.find((candidate) => candidate.intent === intent);
+  return { text: rule?.text ?? outOfScopeMessage, status: "answer", intent };
+}
 
-  if (!includesAny(text, portfolioTerms)) {
-    return { text: outOfScopeMessage, status: "out-of-scope" };
-  }
-
-  if (includesAny(text, ["fastlaundry", "lavanderia", "caja", "trazabilidad"])) {
-    return {
-      text: "FASTLAUNDRY es un sistema Django de uso real para una lavandería. Gestiona clientes, pedidos, caja, pagos, guías, estados y trazabilidad operativa sobre PostgreSQL. El código es privado porque forma parte de una operación productiva.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["carey assistant", "ollama", "tauri", "rust", "ia local"])) {
-    return {
-      text: "Carey Assistant es una aplicación de escritorio para Windows construida con Tauri, React, TypeScript y Rust. Integra IA local con Ollama, selección de modelos, utilidades, noticias, notificaciones y automatización. El código principal es privado y sus releases se publican en GitHub.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["spacex", "falcon 9", "falcon9", "machine learning", "data science"])) {
-    return {
-      text: "SpaceX Falcon 9 Landing Prediction es un proyecto de ciencia de datos con Python. Incluye análisis tabular, SQL, visualizaciones, mapas, dashboard y experimentos de clasificación con scikit-learn y TensorFlow.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["literalura", "gutendex", "spring boot", "jpa"])) {
-    return {
-      text: "LiterAlura es una aplicación CLI con Java 17 y Spring Boot que integra Gutendex con PostgreSQL/JPA. Permite buscar y persistir libros y autores, consultar por idioma y evaluar autores vivos en un año, con pruebas y CI en GitHub Actions.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["forohub", "foro hub", "flyway"])) {
-    return {
-      text: "ChallengeForoHub es un backend educativo con Java, Spring Boot, Spring Data JPA, MySQL y Flyway. Expone operaciones reales de lectura y creación de posts y está documentado como proyecto de aprendizaje backend.",
-      status: "answer",
-    };
-  }
-
-  if (
-    includesAny(text, [
-      "canchaclara",
-      "challenge encriptador",
-      "programacionavanzadainacap",
-      "programacion avanzada",
-      "laboratorio",
-    ])
-  ) {
-    return {
-      text: "En laboratorio y proyectos secundarios aparecen ChallengeForoHub, CanchaClara, Challenge Encriptador y ProgramacionAvanzadaInacap. Funcionan como muestras complementarias de backend, frontend, lógica de producto y formación técnica.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["proyecto", "proyectos", "desarrollado", "construido"])) {
-    return {
-      text: "Los proyectos destacados son FASTLAUNDRY, Carey Assistant, SpaceX Falcon 9 Landing Prediction y LiterAlura. En conjunto muestran sistemas reales de negocio, aplicaciones desktop con IA local, data science y backend Java/Spring Boot.",
-      status: "answer",
-    };
-  }
-
-  if (
-    includesAny(text, [
-      "tecnologia",
-      "tecnologias",
-      "stack",
-      "python",
-      "django",
-      "java",
-      "spring boot",
-      "postgresql",
-      "typescript",
-      "react",
-      "rust",
-      "ia",
-      "api",
-      "apis",
-    ])
-  ) {
-    return {
-      text: "El stack actual de Sergio combina Python/Django, Java/Spring Boot, PostgreSQL/MySQL, TypeScript/React/Next.js, Tauri/Rust, Ollama y LLMs, además de automatización, GitHub Actions, Heroku y Vercel.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["servicio", "servicios", "automatizacion", "chatbot", "soporte"])) {
-    return {
-      text: "Sergio puede aportar en sistemas web y backend operacional, automatización e IA aplicada, integraciones de APIs y desarrollo de productos web o desktop con foco en estabilidad y mantenimiento.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["contacto", "correo", "email", "github", "linkedin", "hablemos"])) {
-    return { text: contactText, status: "answer" };
-  }
-
-  if (includesAny(text, ["quien", "perfil", "sergio", "carey", "inacap", "arica"])) {
-    return {
-      text: "Sergio Enrique Carey Alegre, visible profesionalmente como Sergio Carey, es Ingeniero Informático formado en Inacap y ubicado en Arica, Chile. Su foco está en backend, IA aplicada, automatización, datos y desarrollo de productos digitales.",
-      status: "answer",
-    };
-  }
-
-  if (includesAny(text, ["asistente", "bot", "portafolio", "puedes hacer"])) {
-    return {
-      text: "Soy una demo local del portafolio. Puedo orientar sobre el perfil de Sergio, sus proyectos principales, tecnologías, servicios y formas de contacto. No uso API externa ni guardo conversaciones en un servidor.",
-      status: "answer",
-    };
-  }
-
-  return {
-    text: "Puedo ayudarte con una vista rápida del perfil de Sergio, sus proyectos, tecnologías, servicios o contacto. Prueba preguntando por Carey Assistant, FASTLAUNDRY, LiterAlura, SpaceX o su stack.",
-    status: "answer",
-  };
+/** Enlaces que el asistente puede renderizar; cualquier otro se muestra como texto. */
+export function isAllowedAssistantHref(href: string): boolean {
+  return (
+    /^#[a-z-]+$/.test(href) ||
+    href === "/cv" ||
+    href === `mailto:${profile.email}` ||
+    href === profile.github ||
+    href.startsWith(`${profile.github}/`) ||
+    href === profile.linkedin
+  );
 }

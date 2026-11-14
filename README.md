@@ -1,6 +1,6 @@
 # Sergio Carey — Portfolio v2
 
-Portafolio profesional de **Sergio Enrique Carey Alegre**, Ingeniero Informático enfocado en backend, inteligencia artificial aplicada, automatización, datos y construcción de productos digitales para problemas reales.
+Portafolio profesional de **Sergio Enrique Carey Alegre**, Ingeniero en Informática enfocado en backend, inteligencia artificial aplicada, automatización, datos y construcción de productos digitales para problemas reales.
 
 [![CI](https://github.com/SC-Sergio/sergio-portfolio-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/SC-Sergio/sergio-portfolio-v2/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
@@ -26,57 +26,32 @@ El sitio funciona como la portada técnica de mi trabajo y reúne:
 
 ## Proyectos destacados
 
-La selección principal está orientada a mostrar variedad técnica:
-
 | Proyecto | Enfoque | Stack destacado |
 | --- | --- | --- |
-| **FASTLAUNDRY** | Sistema real de negocio | Python, Django, PostgreSQL, Heroku |
-| **Carey Assistant** | IA local y aplicación desktop | Tauri, React, TypeScript, Rust, Ollama |
-| **SpaceX Falcon 9 Landing Prediction** | Data Science / Machine Learning | Python, Pandas, SQL, scikit-learn, TensorFlow |
-| **LiterAlura** | Backend Java e integración de APIs | Java 17, Spring Boot, PostgreSQL, JPA, Gutendex |
+| **Pegasus Knowledge Center** | IA aplicada / RAG | Python, Gemini, ChromaDB, Sentence Transformers, Docker |
+| **Carey Assistant** | Escritorio con IA local | Tauri, Rust, React, TypeScript, Ollama |
+| **FASTLAUNDRY** | Sistema web en operación (privado) | Python, Django, PostgreSQL |
+| **LiterAlura** / **ForoHub** | Backend Java | Java 17, Spring Boot, JPA, PostgreSQL/MySQL |
+| **SpaceX Falcon 9** | Ciencia de datos | Python, Pandas, scikit-learn, TensorFlow |
 
-FASTLAUNDRY es un proyecto privado de uso operativo. Los demás proyectos públicos incluyen enlaces directos desde el propio portfolio.
+Los datos de cada proyecto se verificaron contra su repositorio público; ver `docs/PORTFOLIO_V3_EXECUTION.md`.
 
 ## Stack del portfolio
 
-- **Next.js 16** con App Router
-- **React 19**
-- **TypeScript 5**
-- **Tailwind CSS 4**
-- **Motion** para transiciones
-- **Three.js**, React Three Fiber y Drei para la escena 3D
-- **Lucide React** para iconografía
-- despliegue preparado para **Vercel**
+- **Next.js 16** (App Router, página estática) · **React 19** · **TypeScript 5** · **Tailwind CSS 4**
+- **Three.js** + React Three Fiber para el núcleo 3D (solo desktop; SVG en móvil, sin descargar Three.js)
+- **Playwright** para pruebas unitarias y E2E · **Lucide** para iconos · despliegue en **Vercel**
 
 ## Arquitectura
 
 ```text
-app/
-  layout.tsx              # Metadata global, canonical y social cards
-  page.tsx                # Composición principal + JSON-LD
-  globals.css             # Tokens visuales y estilos globales
-  sitemap.ts
-  robots.ts
-  opengraph-image.tsx
-  twitter-image.tsx
-
-components/
-  Hero.tsx
-  Scene3D.tsx
-  About.tsx
-  TechStack.tsx
-  Projects.tsx
-  Services.tsx
-  Contact.tsx
-  PortfolioAssistant.tsx
-  Navbar.tsx
-  Footer.tsx
-  AnimatedSection.tsx
-
-data/
-  projects.ts             # Contenido y enlaces de proyectos
-  skills.ts               # Stack, credenciales y servicios
-  assistant.ts            # Base de conocimiento del asistente local
+app/          layout, página, /cv, 404, sitemap, robots, manifest, iconos e imágenes sociales
+components/   Navbar, Hero (+ Scene3D, HeroCoreStatic, boundary), About, TechStack, Projects,
+              Services, Contact, Footer, PortfolioAssistant
+data/         profile, projects, skills, navigation, assistant (contenido separado de la vista)
+lib/          site (URL canónica), socialImage
+tests/        unit/ (asistente) y e2e/ (navegación, anclas, 3D, SEO, responsive…)
+scripts/      measure-perf.mjs, screenshots.mjs
 ```
 
 ## Asistente local
@@ -129,7 +104,10 @@ npm run dev
 
 ```bash
 npm run lint
+npm run typecheck
 npm run build
+npx playwright install chromium   # una vez
+npm test                          # unit + E2E contra el build de producción
 ```
 
 ## Integración continua
@@ -137,9 +115,7 @@ npm run build
 GitHub Actions valida el repositorio con un entorno limpio y ejecuta:
 
 ```text
-npm ci
-npm run lint
-npm run build
+npm ci → npm audit (critical) → lint → typecheck → build → Playwright (unit + E2E desktop y móvil)
 ```
 
 El workflow utiliza permisos mínimos y acciones oficiales fijadas a commits inmutables.
@@ -164,7 +140,7 @@ Si la variable no está definida, el proyecto utiliza `http://localhost:3000` co
 ## Autor
 
 **Sergio Enrique Carey Alegre**  
-Ingeniero Informático · Arica, Chile
+Ingeniero en Informática · Arica, Chile
 
 - GitHub: [SC-Sergio](https://github.com/SC-Sergio)
 - LinkedIn: [Sergio Enrique Carey Alegre](https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/)

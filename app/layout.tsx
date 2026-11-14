@@ -1,58 +1,53 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { profile } from "@/data/profile";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-).replace(/\/$/, "");
+// Fuentes autoalojadas por next/font en el build: sin peticiones a Google en runtime
+// y con métricas de respaldo ajustadas para evitar desplazamientos al cargar.
+const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display-face", display: "swap" });
+const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono-face", display: "swap", preload: false });
+
+const title = `${profile.name} · ${profile.title}`;
+const description =
+  "Portafolio de Sergio Carey, Ingeniero en Informática en Arica, Chile: desarrollo de software con Python y Django, IA aplicada (RAG, modelos locales) y automatización.";
 
 export const metadata: Metadata = {
-  title: "Sergio Carey | Ingeniero Informático",
-  description:
-    "Portafolio de Sergio Enrique Carey Alegre, Ingeniero Informático enfocado en Python, Django, Inteligencia Artificial, automatización, chatbots y desarrollo web.",
   metadataBase: new URL(siteUrl),
-  authors: [{ name: "Sergio Enrique Carey Alegre" }],
-  creator: "Sergio Enrique Carey Alegre",
-  keywords: [
-    "Sergio Carey",
-    "Sergio Enrique Carey Alegre",
-    "Ingeniero Informático",
-    "Python",
-    "Django",
-    "Inteligencia Artificial",
-    "automatización",
-    "chatbots",
-    "desarrollo web",
-  ],
-  alternates: {
-    canonical: "/",
-  },
+  title: { default: title, template: `%s · ${profile.name}` },
+  description,
+  applicationName: `${profile.name} — Portafolio`,
+  authors: [{ name: profile.fullName, url: profile.github }],
+  creator: profile.fullName,
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Sergio Carey | Ingeniero Informático",
-    description:
-      "Portafolio profesional de Sergio Enrique Carey Alegre: desarrollo web, automatización, chatbots e IA aplicada con Python y Django.",
-    url: "/",
-    locale: "es_CL",
-    siteName: "Sergio Carey",
     type: "website",
+    locale: "es_CL",
+    url: "/",
+    siteName: profile.name,
+    title,
+    description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sergio Carey | Ingeniero Informático",
-    description:
-      "Portafolio profesional de Sergio Enrique Carey Alegre: Python, Django, IA, automatización y desarrollo web.",
+    title,
+    description,
   },
+  robots: { index: true, follow: true },
+  formatDetection: { telephone: false },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  themeColor: "#04060a",
+  colorScheme: "dark",
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className="h-full antialiased">
-      <body className="min-h-full bg-background font-sans text-foreground">
-        {children}
-      </body>
+    <html lang="es-CL" className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}>
+      <body className="min-h-svh bg-bg font-sans text-ink">{children}</body>
     </html>
   );
 }

@@ -1,35 +1,50 @@
-import { CheckCircle2 } from "lucide-react";
-import AnimatedSection from "@/components/AnimatedSection";
+import { ArrowRight } from "lucide-react";
+import SectionHeader from "@/components/SectionHeader";
 import { services } from "@/data/skills";
 
 export default function Services() {
   return (
-    <AnimatedSection id="services" className="cv-auto tech-frame border-y border-cyan-200/[0.10] bg-[#06090a]/80 px-4 py-20 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[92rem]">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold text-amber-200">Servicios y experiencia</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-            Ayudo a convertir procesos dispersos en herramientas claras y mantenibles.
-          </h2>
-        </div>
+    <section id="services" aria-labelledby="services-title" className="relative border-y border-line bg-bg-raised py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader
+          id="services-title"
+          index="04"
+          eyebrow="Servicios"
+          title="Problemas que puedo ayudarte a resolver."
+          lede="Cada capacidad enlaza al proyecto donde ya la apliqué."
+        />
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-3 xl:gap-5">
-          {services.map((service) => (
-            <article key={service.title} className="premium-card flex min-h-72 flex-col rounded-lg p-5 xl:p-6">
-              <h3 className="text-xl font-semibold text-white">{service.title}</h3>
-              <p className="mt-4 flex-1 text-sm leading-7 text-zinc-300">{service.description}</p>
-              <ul className="mt-6 space-y-3">
-                {service.points.map((point) => (
-                  <li key={point} className="flex items-center gap-3 text-sm text-zinc-200">
-                    <CheckCircle2 size={17} className="shrink-0 text-cyan-200" aria-hidden="true" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </article>
+        <ol className="mt-14 divide-y divide-line border-y border-line">
+          {services.map((service, index) => (
+            <li key={service.title} className="reveal group grid gap-4 py-7 md:grid-cols-12 md:gap-8">
+              <div className="flex items-baseline gap-4 md:col-span-4">
+                <span className="font-mono text-sm text-violet">{String(index + 1).padStart(2, "0")}</span>
+                <h3 className="font-display text-xl font-semibold text-ink transition-colors group-hover:text-cyan-soft">
+                  {service.title}
+                </h3>
+              </div>
+              <p className="text-ink-soft md:col-span-3">
+                <span className="sr-only">Problema: </span>
+                {service.problem}
+              </p>
+              <p className="text-muted md:col-span-3">
+                <span className="sr-only">Enfoque: </span>
+                {service.approach}
+              </p>
+              <div className="md:col-span-2 md:text-right">
+                <a href={service.evidence.href} className="link-arrow font-mono text-xs">
+                  <span className="sr-only">Ver proyecto de referencia: </span>
+                  {service.evidence.label}
+                  <ArrowRight size={13} aria-hidden="true" />
+                </a>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
+        <p className="reveal mt-6 font-mono text-xs text-muted">
+          Sin precios publicados: cada alcance se conversa según el problema y sus restricciones.
+        </p>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
