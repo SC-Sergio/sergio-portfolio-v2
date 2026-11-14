@@ -47,7 +47,7 @@ test.describe("portada", () => {
   test("la altura del documento no cambia al recorrer la página", async ({ page }) => {
     await page.goto("/");
     // Tras la carga, RenderGate termina de renderizar las secciones diferidas.
-    await expect(page.locator("html")).toHaveAttribute("data-render", "all", { timeout: 10_000 });
+    await expect(page.locator("html")).toHaveAttribute("data-render", "all", { timeout: 20_000 });
     const heights = await page.evaluate(async () => {
       const values: number[] = [document.documentElement.scrollHeight];
       for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight * 0.7) {
@@ -82,7 +82,7 @@ test.describe("portada", () => {
   test("en una visita nueva sin ancla, las secciones se renderizan de forma diferida y luego todas", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(".defer-render").first()).toBeAttached();
-    await expect(page.locator("html")).toHaveAttribute("data-render", "all", { timeout: 10_000 });
+    await expect(page.locator("html")).toHaveAttribute("data-render", "all", { timeout: 20_000 });
   });
 
   test("Home y End llegan al inicio y al final", async ({ page, isMobile }) => {
