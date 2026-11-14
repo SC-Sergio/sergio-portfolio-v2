@@ -214,7 +214,7 @@ export default function Projects() {
   const rest = projects.filter((project) => project !== featured);
 
   return (
-    <section id="projects" aria-labelledby="projects-title" className="relative py-24 sm:py-32">
+    <section id="projects" aria-labelledby="projects-title" className="defer-render relative py-24 sm:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           id="projects-title"

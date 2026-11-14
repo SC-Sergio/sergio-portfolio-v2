@@ -41,7 +41,7 @@ function Timeline({ items, label, icon: Icon }: { items: TimelineItem[]; label: 
 
 export default function About() {
   return (
-    <section id="about" aria-labelledby="about-title" className="relative py-24 sm:py-32">
+    <section id="about" aria-labelledby="about-title" className="defer-render relative py-24 sm:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           id="about-title"

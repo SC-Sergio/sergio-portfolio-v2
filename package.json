@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:unit": "playwright test --project=unit",
-    "perf": "node scripts/measure-perf.mjs"
+    "perf": "node scripts/measure-perf.mjs",
+    "cv:pdf": "node scripts/build-cv-pdf.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^9.6.1",

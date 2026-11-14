@@ -6,7 +6,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-line bg-bg-raised">
+    <footer className="defer-render border-t border-line bg-bg-raised">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12 lg:px-8">
         <div className="md:col-span-5">
           <a href="#home" className="inline-flex items-center gap-2.5 rounded-md">

@@ -16,9 +16,9 @@ const cvProjects = projects.filter((project) => ["pegasus", "carey-assistant", "
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="break-inside-avoid-page border-t border-line pt-6 print:border-slate-300 print:pt-4">
-      <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-cyan-soft print:text-slate-600">{title}</h2>
-      <div className="mt-4">{children}</div>
+    <section className="border-t border-line pt-6 print:border-slate-300 print:pt-3">
+      <h2 className="break-after-avoid font-mono text-xs uppercase tracking-[0.18em] text-cyan-soft print:text-slate-600">{title}</h2>
+      <div className="mt-4 print:mt-2.5">{children}</div>
     </section>
   );
 }
@@ -36,7 +36,7 @@ export default function CvPage() {
         </div>
       </div>
 
-      <main id="main" className="mx-auto max-w-4xl space-y-8 px-4 py-10 text-ink sm:px-6 sm:py-14 print:max-w-none print:space-y-5 print:p-0 print:text-slate-900">
+      <main id="main" className="mx-auto max-w-4xl space-y-8 px-4 py-10 text-ink sm:px-6 sm:py-14 print:max-w-none print:space-y-4 print:p-0 print:text-slate-900">
         <header>
           <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-5xl print:text-3xl">{profile.fullName}</h1>
           <p className="mt-2 text-lg text-cyan-soft print:text-base print:text-slate-700">
@@ -64,9 +64,9 @@ export default function CvPage() {
         </header>
 
         <Section title="Experiencia">
-          <ol className="space-y-5">
+          <ol className="space-y-5 print:space-y-3">
             {experience.map((item) => (
-              <li key={`${item.organization}-${item.title}`} className="grid gap-1 sm:grid-cols-[10rem_1fr] sm:gap-6">
+              <li key={`${item.organization}-${item.title}`} className="grid break-inside-avoid gap-1 sm:grid-cols-[10rem_1fr] sm:gap-6">
                 <p className="font-mono text-xs text-muted print:text-slate-500">{item.period}</p>
                 <div>
                   <p className="font-medium">
@@ -80,9 +80,9 @@ export default function CvPage() {
         </Section>
 
         <Section title="Proyectos seleccionados">
-          <ul className="space-y-4">
+          <ul className="space-y-4 print:space-y-3">
             {cvProjects.map((project) => (
-              <li key={project.slug}>
+              <li key={project.slug} className="break-inside-avoid">
                 <p className="font-medium">
                   {project.name} <span className="font-mono text-xs text-muted print:text-slate-500">· {project.status}</span>
                 </p>
@@ -96,7 +96,7 @@ export default function CvPage() {
         <Section title="Formación">
           <ul className="space-y-3">
             {education.map((item) => (
-              <li key={item.title} className="grid gap-1 sm:grid-cols-[10rem_1fr] sm:gap-6">
+              <li key={item.title} className="grid break-inside-avoid gap-1 sm:grid-cols-[10rem_1fr] sm:gap-6">
                 <p className="font-mono text-xs text-muted print:text-slate-500">{item.period}</p>
                 <p>
                   <span className="font-medium">{item.title}</span>
@@ -110,7 +110,7 @@ export default function CvPage() {
         <Section title="Stack técnico">
           <dl className="grid gap-3 sm:grid-cols-2">
             {stackGroups.map((group) => (
-              <div key={group.id}>
+              <div key={group.id} className="break-inside-avoid">
                 <dt className="text-sm font-medium">{group.title}</dt>
                 <dd className="mt-0.5 text-sm text-ink-soft print:text-slate-700">{group.items.map((item) => item.name).join(", ")}</dd>
               </div>

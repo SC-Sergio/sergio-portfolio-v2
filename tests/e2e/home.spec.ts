@@ -46,6 +46,8 @@ test.describe("portada", () => {
 
   test("la altura del documento no cambia al recorrer la página", async ({ page }) => {
     await page.goto("/");
+    // Tras la carga, RenderGate termina de renderizar las secciones diferidas.
+    await expect(page.locator("html")).toHaveAttribute("data-render", "all", { timeout: 20_000 });
     const heights = await page.evaluate(async () => {
       const values: number[] = [document.documentElement.scrollHeight];
       for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight * 0.7) {
@@ -58,17 +60,47 @@ test.describe("portada", () => {
     expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2);
   });
 
+  test("scroll inmediato tras cargar: sin desplazamientos visibles (CLS)", async ({ page }) => {
+    await page.addInitScript(() => {
+      (window as unknown as { __cls: number }).__cls = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries() as PerformanceEntry[] & { value: number }[]) {
+          (window as unknown as { __cls: number }).__cls += (entry as unknown as { value: number }).value;
+        }
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    for (let i = 0; i < 6; i += 1) {
+      await page.mouse.wheel(0, 500);
+      await page.waitForTimeout(120);
+    }
+    await expect(page.locator("html")).toHaveAttribute("data-render", "all");
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => (window as unknown as { __cls: number }).__cls)).toBeLessThan(0.02);
+  });
+
+  test("en una visita nueva sin ancla, las secciones se renderizan de forma diferida y luego todas", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".defer-render").first()).toBeAttached();
+    await expect(page.locator("html")).toHaveAttribute("data-render", "all", { timeout: 20_000 });
+  });
+
   test("Home y End llegan al inicio y al final", async ({ page, isMobile }) => {
     test.skip(isMobile, "teclado físico solo en desktop");
+    test.setTimeout(60_000);
     await page.goto("/");
-    await page.locator("body").click({ position: { x: 5, y: 300 } });
+    // Con WebGL por software (CI) la escena puede bloquear el hilo principal y la tecla
+    // llegar tarde: se espera a que la carga termine, como haría alguien que ya lee la página.
+    await page.waitForLoadState("networkidle");
+    await page.locator("main").focus();
     await page.keyboard.press("End");
-    await waitForScrollEnd(page);
-    const atEnd = await page.evaluate(() => Math.abs(window.scrollY + window.innerHeight - document.documentElement.scrollHeight) <= 2);
-    expect(atEnd).toBe(true);
+    await expect
+      .poll(() => page.evaluate(() => Math.abs(window.scrollY + window.innerHeight - document.documentElement.scrollHeight) <= 2), {
+        timeout: 15_000,
+      })
+      .toBe(true);
     await page.keyboard.press("Home");
-    await waitForScrollEnd(page);
-    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 15_000 }).toBe(0);
   });
 
   test("recargar en una posición intermedia conserva la sección", async ({ page }) => {

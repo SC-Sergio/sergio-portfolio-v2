@@ -11,7 +11,7 @@ const channels = [
 
 export default function Contact() {
   return (
-    <section id="contact" aria-labelledby="contact-title" className="relative py-24 sm:py-32">
+    <section id="contact" aria-labelledby="contact-title" className="defer-render relative py-24 sm:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="hud reveal relative overflow-hidden rounded-2xl px-5 py-12 sm:px-12 sm:py-16">
           <div className="grid-bg pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
