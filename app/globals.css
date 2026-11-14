@@ -320,6 +320,7 @@ html:has(:target) .defer-render {
   body {
     background: #fff !important;
     color: #0f172a !important;
+    color-scheme: light;
   }
 
   .no-print {

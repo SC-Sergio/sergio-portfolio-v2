@@ -203,3 +203,15 @@ test("regresión: el panel del asistente no queda bajo el navbar", async ({ page
   const dialogTop = await page.getByRole("dialog").evaluate((element) => element.getBoundingClientRect().top);
   expect(dialogTop).toBeGreaterThanOrEqual(navBottom);
 });
+
+test("CV: la versión impresa cabe en 2 páginas A4 y conserva los enlaces", async ({ page, browserName, isMobile }) => {
+  test.skip(browserName !== "chromium" || isMobile, "page.pdf solo en Chromium de escritorio");
+  await page.goto("/cv", { waitUntil: "networkidle" });
+  await page.emulateMedia({ media: "print" });
+  const pdf = (await page.pdf({ format: "A4", printBackground: true, preferCSSPageSize: true })).toString("latin1");
+  const pages = pdf.match(/\/Type\s*\/Page[^s]/g) ?? [];
+  expect(pages.length).toBeLessThanOrEqual(2);
+  expect(pdf).toContain("mailto:sergiocareyhola@gmail.com");
+  expect(pdf).toContain("https://github.com/SC-Sergio");
+  expect(pdf).not.toMatch(/\+?56\s?9\d{8}/);
+});

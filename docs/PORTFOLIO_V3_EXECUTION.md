@@ -117,8 +117,82 @@ Space Grotesk.
 | 2026-11-14 | Producción (Vercel, proyecto existente) sirve `faed1dd`; suite E2E contra la URL pública: 72/73 al primer intento |
 | 2026-11-14 | Ajustes de pruebas tras correr contra producción: los chunks en Vercel viven en `/_next/static/immutable/`, y la prueba de bloqueo del asistente necesitaba más tiempo bajo carga |
 
+## Pulido final (2026-11-14)
+
+### Diagnóstico del rendimiento móvil
+
+A/B intercalado (`scripts/ab-perf.mjs`, 9 rondas, orden rotado, builds servidos fuera de OneDrive), perfil móvil
+CPU ×4 / 150 ms / 1,6 Mbps. Mediana [rango intercuartil]:
+
+| Variante | FCP = LCP | TBT | Fuentes |
+| --- | --- | --- | --- |
+| O · `c3fb6c2` (antes del rediseño) | 868 [864–872] | 138 [131–145] | 0 KB |
+| A · `e011749` (V3) | 1220 [1180–1276] | 162 [145–186] | 109 KB |
+| B · A sin precargar Inter | 1184 [1180–1208] | 124 [122–238] | 109 KB |
+| C · A sin precargar ninguna fuente | 1144 [1136–1168] | 258 [256–307] | 109 KB |
+| D · A sin Inter (cuerpo con fuente del sistema) | 1352 [1328–1440] | 147 [137–153] | 61 KB |
+| E · A **sin ninguna fuente web** | 1216 [1188–1292] | 125 [121–129] | 0 KB |
+| G · A sin animación `reveal` | 1124 [1112–1160] | 168 [118–181] | 109 KB |
+| F · A sin la máscara de la cuadrícula | 1188 [1188–1208] | 172 [151–182] | 109 KB |
+
+Conclusiones:
+- **Las fuentes no son la causa**: sin ninguna fuente web (E) el FCP es igual al de A. No se cambió la tipografía.
+- El elemento LCP es el párrafo del Hero (`p`), no el H1.
+- Trazas de Chrome antes del primer pintado: Layout **~450 ms vs ~200 ms** y recálculo de estilos 110 vs 25 ms.
+  La V3 maqueta toda la página antes de pintar; la versión anterior lo evitaba con `content-visibility`
+  (que a la vez causaba los saltos de scroll).
+
+### Cambio aplicado: render diferido solo durante la carga
+
+`.defer-render` (`content-visibility: auto`) en las secciones bajo el Hero, únicamente hasta que:
+`RenderGate` las activa de a una en momentos ociosos tras `load` (~550 ms en el perfil móvil), o el usuario
+interactúa (scroll, toque, tecla: lo escucha un script en línea del `<head>`, sin esperar la hidratación), o la visita
+es una recarga, navegación del historial o trae un ancla (se renderiza todo antes del primer pintado).
+Después, `data-render="all"` deja la altura del documento fija.
+
+| Variante | FCP = LCP | TBT |
+| --- | --- | --- |
+| A · V3 | 1204 [1168–1204] | 172 [169–187] |
+| H · render diferido, activado todo de una vez | 904 [884–916] | 161 [143–303] |
+| **I · render diferido progresivo (aplicado)** | **900 [892–912]** | **128 [121–134]** |
+
+- Desktop: sin regresión (diferencias dentro del ruido).
+- Capturas antes/después con movimiento reducido: **12 de 12 idénticas píxel a píxel** (móvil y desktop, 6 secciones).
+- Pruebas nuevas: CLS < 0,02 con scroll inmediato tras cargar; render completo tras la carga; altura estable.
+- Descartados: quitar la precarga (C sube el TBT), quitar Inter (D empeora el FCP), quitar `reveal` (−80 ms, pero es
+  parte del diseño aprobado y el render diferido ya recupera la diferencia).
+- Nota de pruebas: con WebGL por software y 6 workers, la prueba Home/End falla de forma intermitente también en el
+  build original (1 de 12); se estabilizó esperando la carga y con timeout global de 60 s.
+
+### Datos profesionales pendientes de confirmación del propietario
+
+| Dato | Dónde aparece | Fuente | Qué confirmar |
+| --- | --- | --- | --- |
+| Tupoclick Softwares «Desde nov. 2025» y redacción en presente («Hoy desarrollo…», «Lo desarrolla…») | Perfil, `/cv`, asistente, tarjeta FASTLAUNDRY | CV de nov. 2025 marcado «(Actual)» | Si el cargo sigue vigente o su fecha de término |
+| «Vending Store Limitada» en el cargo de Desarrollador Python | Perfil, `/cv`, asistente | El CV escribe «Vending Store Ilimitada» en ese cargo y «LIMITADA» en la práctica | Razón social correcta |
+| «Abierto a trabajo remoto» | Hero, Contacto | Orden del propietario (capacidad de trabajo remoto) | Que quiera declararlo así |
+| Contenido del perfil de LinkedIn | Enlaces | La URL responde, pero LinkedIn exige iniciar sesión para verla | Que el perfil esté al día |
+
+Verificado sin cambios: repositorios públicos (todos responden 200), Carey Assistant sigue en v0.1.19, Pegasus no está
+archivado, JSON-LD sin empleador declarado (`worksFor` omitido a propósito), formación y idiomas coinciden con el CV.
+
+### CV en PDF
+
+- `npm run cv:pdf -- <url> <salida.pdf>` genera el PDF desde `/cv` (A4, 2 páginas, fondo blanco, enlaces de correo,
+  GitHub y LinkedIn activos, sin teléfono). Prueba de regresión: «la versión impresa cabe en 2 páginas A4».
+- Se corrigió la impresión de `/cv`: marco oscuro por `color-scheme: dark` y saltos de página que dejaban media hoja vacía.
+- **No se publica un PDF estático** hasta que el propietario confirme la tabla anterior. Mientras tanto, el botón
+  «Imprimir / PDF» de `/cv` produce el mismo documento desde el navegador.
+
+### Dominio
+
+- WHOIS 2026-11-14 (2.ª verificación): `sergiocareydev.cl` sigue **sin registrar**; no hay DNS. No se generaron cargos.
+
 ## Próxima acción
 
-Solo queda el dominio propio, que depende de una compra que el autor debe aprobar (ver **Dominio propio**). Después:
-agregar `sergiocareydev.cl` y `www` al proyecto Vercel existente, crear en NIC Chile los registros que entregue Vercel,
-verificar HTTPS y cambiar `NEXT_PUBLIC_SITE_URL` en Production a `https://www.sergiocareydev.cl`.
+1. Propietario: confirmar los datos de la tabla anterior (si cambian, editar `data/profile.ts` y regenerar el PDF con
+   `npm run cv:pdf`, dejándolo en `public/` y enlazándolo desde `/cv`).
+2. Propietario: registrar `sergiocareydev.cl` en nic.cl ($9.990 CLP/año). Después: agregar `sergiocareydev.cl` y
+   `www.sergiocareydev.cl` al proyecto Vercel `sergio-portfolio-v2`, crear en NIC Chile los registros DNS que indique
+   Vercel, verificar HTTPS, redirigir el dominio raíz a `www` y fijar `NEXT_PUBLIC_SITE_URL=https://www.sergiocareydev.cl`
+   en Production.
