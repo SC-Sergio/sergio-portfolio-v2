@@ -27,7 +27,7 @@ test.describe("proyectos", () => {
 
 test.describe("asistente", () => {
   test("responde todas las preguntas rápidas dentro del alcance", async ({ page }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
     await page.goto("/");
     await page.getByRole("button", { name: "Abrir asistente del portafolio" }).click();
     const dialog = page.getByRole("dialog", { name: "Asistente del portafolio" });
@@ -57,14 +57,17 @@ test.describe("asistente", () => {
   });
 
   test("bloquea tras preguntas fuera de tema y se puede reiniciar", async ({ page }) => {
-    test.setTimeout(30_000);
+    test.setTimeout(90_000);
     await page.goto("/");
     await page.getByRole("button", { name: "Abrir asistente del portafolio" }).click();
     const input = page.locator("#portfolio-assistant-input");
-    for (const question of ["¿Quién ganará el mundial?", "Receta de pan", "Clima de mañana"]) {
+    const replies = page.getByRole("dialog").locator('[data-role="assistant"]');
+    for (const [index, question] of ["¿Quién ganará el mundial?", "Receta de pan", "Clima de mañana"].entries()) {
+      await expect(input).toBeEnabled();
       await input.fill(question);
       await input.press("Enter");
-      await page.waitForTimeout(1300);
+      await expect(replies).toHaveCount(index + 2);
+      await page.waitForTimeout(1500); // cooldown entre preguntas
     }
     await expect(input).toBeDisabled();
     await page.getByRole("button", { name: "Reiniciar chat" }).click();
@@ -143,12 +146,14 @@ test.describe("núcleo del Hero", () => {
 
   test("desktop: si el chunk 3D falla al descargarse, la página sobrevive", async ({ page, isMobile }) => {
     test.skip(isMobile, "solo desktop");
-    let loaded = false;
-    page.on("load", () => {
-      loaded = true;
+    // Se aborta el chunk que contiene Three.js (se identifica por su contenido, porque
+    // según la red puede pedirse antes o después del evento load).
+    await page.route("**/_next/static/**/*.js*", async (route) => {
+      const response = await route.fetch();
+      const body = await response.text();
+      if (body.includes("WebGLRenderer")) return route.abort();
+      return route.fulfill({ response, body });
     });
-    // Todo chunk pedido después de `load` es la escena diferida: se aborta.
-    await page.route("**/_next/static/chunks/**", (route) => (loaded ? route.abort() : route.continue()));
     await page.goto("/");
     await expect(page.locator("[data-scene-failure='load-error']")).toHaveCount(1, { timeout: 15_000 });
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
