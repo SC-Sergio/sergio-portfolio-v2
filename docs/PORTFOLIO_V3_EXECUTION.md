@@ -83,12 +83,42 @@ Rediseño visual completo, corrección de los defectos conocidos, pruebas automa
 
 - 2026-11-14, WHOIS: `sergiocareydev.cl` (NIC Chile) y `sergiocareydev.com` (Verisign) **no registrados**.
   No pertenecen al autor: requieren compra con aprobación explícita. Ver el informe final para precio y pasos.
+- Precio oficial NIC Chile (nic.cl/dominios/tarifas.html, vigente desde el 1-nov-2023): **$9.990 CLP por año, exento de IVA**;
+  la renovación cuesta lo mismo (2 años $19.980, 5 años $49.950). Inscripción en nic.cl con Clave Única o cuenta NIC.
 - Hasta entonces, canonical, sitemap, robots y Open Graph usan `https://sergio-portfolio-v2-roan.vercel.app`.
+
+## Resultado de rendimiento (producción, mismo script y condiciones que la línea base)
+
+| Perfil | Métrica | Antes (`c3fb6c2`) | Después (`faed1dd`) |
+| --- | --- | --- | --- |
+| Desktop 1440 | FCP / LCP | 896 ms | 680 ms |
+| Desktop 1440 | TBT | 117 ms | 25 ms |
+| Desktop 1440 | JS transferido | 425 KB | 393 KB |
+| Móvil (CPU ×4, 4G lenta) | FCP / LCP | 1412 ms | 1596 ms |
+| Móvil | TBT | 153 ms | 192 ms |
+| Móvil | JS transferido | 190 KB | 158 KB |
+| Ambos | CLS | 0 | 0 |
+| Ambos | Altura del documento al recorrer | varía hasta +4116 px | constante |
+| Móvil | Descarga de Three.js | no | no |
+
+Lectura honesta: desktop mejora en todo; en móvil baja el JS (−32 KB) y desaparecen los saltos de scroll, pero el
+LCP sube ~180 ms y el TBT ~40 ms. La causa más probable son las tres familias tipográficas nuevas (el H1 es el elemento
+LCP y su fuente se intercambia al cargar). Son mediciones de laboratorio con red remota (ruido de ±100 ms entre corridas).
+Optimización candidata, pendiente de una medición A/B intercalada: usar fuente del sistema para el cuerpo y precargar solo
+Space Grotesk.
 
 ## Bitácora
 
-- Rama `feat/portfolio-v3`, PR y despliegue: ver la sección siguiente, que se actualiza al cerrar cada etapa.
+| Fecha | Evento |
+| --- | --- |
+| 2026-11-14 | Rama `feat/portfolio-v3`; 5 commits lógicos + 1 corrección (panel del asistente bajo el navbar en móvil) |
+| 2026-11-14 | PR #8: CI falló por pruebas de anclas sensibles al scroll suave en el runner; se esperaron posiciones finales en vez de pausas |
+| 2026-11-14 | PR #8 en verde (CI + Vercel Preview) → squash-merge `faed1dd`; CI de `main` en verde |
+| 2026-11-14 | Producción (Vercel, proyecto existente) sirve `faed1dd`; suite E2E contra la URL pública: 72/73 al primer intento |
+| 2026-11-14 | Ajustes de pruebas tras correr contra producción: los chunks en Vercel viven en `/_next/static/immutable/`, y la prueba de bloqueo del asistente necesitaba más tiempo bajo carga |
 
 ## Próxima acción
 
-Abrir el PR de `feat/portfolio-v3`, esperar CI y Vercel Preview, fusionar con squash y verificar producción.
+Solo queda el dominio propio, que depende de una compra que el autor debe aprobar (ver **Dominio propio**). Después:
+agregar `sergiocareydev.cl` y `www` al proyecto Vercel existente, crear en NIC Chile los registros que entregue Vercel,
+verificar HTTPS y cambiar `NEXT_PUBLIC_SITE_URL` en Production a `https://www.sergiocareydev.cl`.
