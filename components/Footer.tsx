@@ -1,55 +1,79 @@
-import { ArrowUpRight, Mail } from "lucide-react";
-
-const footerLinks = [
-  {
-    href: "mailto:sergiocareyhola@gmail.com?subject=Consulta%20desde%20tu%20portafolio",
-    label: "Correo",
-    ariaLabel: "Enviar correo a Sergio Carey",
-    icon: Mail,
-  },
-  {
-    href: "https://github.com/SC-Sergio",
-    label: "GitHub",
-    ariaLabel: "Abrir GitHub de Sergio Carey",
-    icon: ArrowUpRight,
-  },
-  {
-    href: "https://www.linkedin.com/in/sergio-enrique-carey-alegre-58b318174/",
-    label: "LinkedIn",
-    ariaLabel: "Abrir LinkedIn de Sergio Carey",
-    icon: ArrowUpRight,
-  },
-];
+import { BrandMark, GitHubIcon, LinkedInIcon } from "@/components/icons";
+import { navSections } from "@/data/navigation";
+import { mailtoHref, profile } from "@/data/profile";
 
 export default function Footer() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="cv-auto border-t border-cyan-200/[0.10] bg-[#050607]/70 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-[92rem] flex-col gap-5 text-sm text-zinc-400 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-2xl">
-          <p className="font-medium text-zinc-200">Sergio Enrique Carey Alegre - Ingeniero Informático</p>
-          <p className="mt-1">Arica, Chile · Python, Django, IA, automatización y desarrollo web.</p>
+    <footer className="border-t border-line bg-bg-raised">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12 lg:px-8">
+        <div className="md:col-span-5">
+          <a href="#home" className="inline-flex items-center gap-2.5 rounded-md">
+            <BrandMark size={30} />
+            <span className="font-display font-semibold text-ink">Sergio Carey</span>
+          </a>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
+            {profile.title} · {profile.location}. Desarrollo de software con Python y Django, IA aplicada y automatización.
+          </p>
         </div>
 
-        <nav className="flex flex-wrap gap-2" aria-label="Enlaces de contacto">
-          {footerLinks.map((link) => {
-            const Icon = link.icon;
-            const isExternal = link.href.startsWith("http");
-
-            return (
-              <a
-                key={link.href}
-                href={link.href}
-                aria-label={link.ariaLabel}
-                target={isExternal ? "_blank" : undefined}
-                rel={isExternal ? "noreferrer" : undefined}
-                className="tech-chip inline-flex h-10 items-center gap-2 rounded-md px-3 text-zinc-300 transition-colors hover:border-cyan-200/40 hover:bg-white/[0.08] hover:text-white"
-              >
-                <Icon size={16} aria-hidden="true" />
-                {link.label}
+        <nav aria-label="Secciones" className="md:col-span-3">
+          <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted">Secciones</p>
+          <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm md:grid-cols-1">
+            {navSections.map((section) => (
+              <li key={section.id}>
+                <a href={`#${section.id}`} className="text-ink-soft transition-colors hover:text-ink">
+                  {section.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href="/cv" className="text-ink-soft transition-colors hover:text-ink">
+                CV
               </a>
-            );
-          })}
+            </li>
+          </ul>
         </nav>
+
+        <div className="md:col-span-4">
+          <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted">Contacto</p>
+          <ul className="mt-4 space-y-2.5 text-sm">
+            <li>
+              <a href={mailtoHref} className="break-all text-ink-soft transition-colors hover:text-ink">
+                {profile.email}
+              </a>
+            </li>
+            <li>
+              <a href={profile.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-ink-soft transition-colors hover:text-ink">
+                <GitHubIcon size={15} /> GitHub<span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            </li>
+            <li>
+              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-ink-soft transition-colors hover:text-ink">
+                <LinkedInIcon size={14} /> LinkedIn<span className="sr-only"> (se abre en una pestaña nueva)</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div className="border-t border-line">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 font-mono text-xs text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <p>
+            © {year} {profile.fullName}
+          </p>
+          <p>
+            Next.js · TypeScript · Three.js —{" "}
+            <a
+              href="https://github.com/SC-Sergio/sergio-portfolio-v2"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline decoration-line-strong underline-offset-4 hover:text-ink"
+            >
+              código fuente
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );

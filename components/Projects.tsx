@@ -1,150 +1,269 @@
-import { ArrowUpRight, Bot, BrainCircuit, Database, Truck } from "lucide-react";
-import AnimatedSection from "@/components/AnimatedSection";
-import { labProjects, projects } from "@/data/projects";
+import { ArrowUpRight, Download, Lock } from "lucide-react";
+import SectionHeader from "@/components/SectionHeader";
+import { GitHubIcon } from "@/components/icons";
+import { labProjects, projects, type Project, type ProjectCategory } from "@/data/projects";
+import { profile } from "@/data/profile";
 
-const projectIcons = [Truck, Bot, BrainCircuit, Database];
-const accentClasses = [
-  "text-emerald-200 bg-emerald-300/10",
-  "text-cyan-200 bg-cyan-300/10",
-  "text-violet-200 bg-violet-300/10",
-  "text-amber-200 bg-amber-300/10",
-];
+const categoryTone: Record<ProjectCategory, string> = {
+  "IA aplicada": "border-violet/35 bg-violet/10 text-violet-soft",
+  Backend: "border-emerald/35 bg-emerald/10 text-emerald-soft",
+  Datos: "border-cyan/35 bg-cyan/10 text-cyan-soft",
+  Escritorio: "border-sky-300/35 bg-sky-300/10 text-sky-200",
+};
+
+/** Flujo técnico del proyecto como cadena de nodos (HTML accesible, se adapta al ancho). */
+function ProjectFlow({ steps, label }: { steps: string[]; label: string }) {
+  return (
+    <ol aria-label={`Flujo técnico de ${label}`} className="flex flex-wrap items-center gap-y-2">
+      {steps.map((step, index) => (
+        <li key={step} className="flex items-center">
+          <span className="rounded-md border border-line-strong bg-bg/70 px-2.5 py-1 font-mono text-[0.7rem] text-ink-soft">
+            {step}
+          </span>
+          {index < steps.length - 1 ? (
+            <span aria-hidden="true" className="mx-1.5 flex items-center text-cyan/70">
+              <span className="h-px w-3 bg-current sm:w-5" />
+              <span className="size-0 border-y-[3px] border-l-[5px] border-y-transparent border-l-current" />
+            </span>
+          ) : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function ProjectLinks({ project }: { project: Project }) {
+  if (project.links.length === 0) {
+    return (
+      <p className="inline-flex items-center gap-2 font-mono text-xs text-muted">
+        <Lock size={13} aria-hidden="true" />
+        Sin enlace público
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {project.links.map((link) => (
+        <a
+          key={link.href}
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-ghost h-10 px-3.5"
+          aria-label={`${link.label} de ${project.name} en GitHub (se abre en una pestaña nueva)`}
+        >
+          {link.kind === "release" ? <Download size={15} aria-hidden="true" /> : <GitHubIcon size={15} />}
+          {link.label}
+          <ArrowUpRight size={14} aria-hidden="true" className="text-muted" />
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function ProjectMeta({ project }: { project: Project }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className={`rounded-full border px-2.5 py-0.5 font-mono text-[0.68rem] ${categoryTone[project.category]}`}>
+        {project.category}
+      </span>
+      <span className="font-mono text-[0.7rem] text-muted">{project.context}</span>
+    </div>
+  );
+}
+
+function FeaturedProject({ project }: { project: Project }) {
+  return (
+    <article
+      id={`project-${project.slug}`}
+      aria-labelledby={`project-${project.slug}-title`}
+      className="hud reveal relative grid gap-10 overflow-hidden rounded-2xl p-6 sm:p-10 lg:grid-cols-12"
+    >
+      <div
+        className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[radial-gradient(circle,rgba(167,139,250,0.16),transparent_70%)]"
+        aria-hidden="true"
+      />
+      <div className="relative lg:col-span-7">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <ProjectMeta project={project} />
+          <span className="chip">{project.status}</span>
+        </div>
+        <p className="mt-6 font-mono text-xs uppercase tracking-[0.16em] text-cyan-soft/80">Proyecto destacado</p>
+        <h3 id={`project-${project.slug}-title`} className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+          {project.name}
+        </h3>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{project.summary}</p>
+
+        <dl className="mt-8 grid gap-6 sm:grid-cols-2">
+          <div>
+            <dt className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">Problema</dt>
+            <dd className="mt-2 text-sm leading-relaxed text-ink-soft">{project.problem}</dd>
+          </div>
+          <div>
+            <dt className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">Mi contribución</dt>
+            <dd className="mt-2 text-sm leading-relaxed text-ink-soft">{project.contribution}</dd>
+          </div>
+        </dl>
+
+        <div className="mt-8">
+          <ProjectLinks project={project} />
+        </div>
+      </div>
+
+      <div className="relative space-y-7 lg:col-span-5">
+        <div className="rounded-xl border border-line bg-bg/60 p-5">
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">Arquitectura</p>
+          <div className="mt-4">
+            <ProjectFlow steps={project.flow} label={project.name} />
+          </div>
+        </div>
+        <div>
+          <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">Características</p>
+          <ul className="mt-3 space-y-2.5">
+            {project.features.map((feature) => (
+              <li key={feature} className="flex gap-3 text-sm leading-relaxed text-ink-soft">
+                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald" aria-hidden="true" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <ul className="flex flex-wrap gap-1.5" aria-label="Tecnologías">
+          {project.stack.map((item) => (
+            <li key={item} className="chip">
+              {item}
+            </li>
+          ))}
+        </ul>
+        {project.note ? <p className="border-l border-violet/40 pl-3 text-xs leading-relaxed text-muted">{project.note}</p> : null}
+      </div>
+    </article>
+  );
+}
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  return (
+    <article
+      id={`project-${project.slug}`}
+      aria-labelledby={`project-${project.slug}-title`}
+      className="panel card-hover reveal flex flex-col rounded-2xl p-6 sm:p-7"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <ProjectMeta project={project} />
+        <span className="font-mono text-xs text-muted" aria-hidden="true">
+          {String(index).padStart(2, "0")}
+        </span>
+      </div>
+      <h3 id={`project-${project.slug}-title`} className="mt-5 font-display text-2xl font-semibold tracking-tight text-ink">
+        {project.name}
+      </h3>
+      <p className="mt-1 font-mono text-[0.72rem] text-cyan-soft/80">{project.status}</p>
+      <p className="mt-4 leading-relaxed text-ink-soft">{project.summary}</p>
+
+      <div className="mt-5 rounded-lg border border-line bg-bg/50 p-4">
+        <ProjectFlow steps={project.flow} label={project.name} />
+      </div>
+
+      <details className="group mt-5 rounded-lg border border-line open:bg-bg/40">
+        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-ink-soft transition-colors hover:text-ink [&::-webkit-details-marker]:hidden">
+          Problema, contribución y características
+          <span aria-hidden="true" className="font-mono text-cyan-soft transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
+        <div className="space-y-4 px-4 pb-4 text-sm leading-relaxed text-ink-soft">
+          <p>
+            <span className="font-medium text-ink">Problema. </span>
+            {project.problem}
+          </p>
+          <p>
+            <span className="font-medium text-ink">Contribución. </span>
+            {project.contribution}
+          </p>
+          <ul className="space-y-1.5">
+            {project.features.map((feature) => (
+              <li key={feature} className="flex gap-2.5">
+                <span className="mt-2 size-1 shrink-0 rounded-full bg-emerald" aria-hidden="true" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
+
+      <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Tecnologías">
+        {project.stack.map((item) => (
+          <li key={item} className="chip">
+            {item}
+          </li>
+        ))}
+      </ul>
+
+      {project.note ? <p className="mt-4 text-xs leading-relaxed text-muted">{project.note}</p> : null}
+
+      <div className="mt-auto pt-6">
+        <ProjectLinks project={project} />
+      </div>
+    </article>
+  );
+}
 
 export default function Projects() {
+  const featured = projects.find((project) => project.featured) ?? projects[0];
+  const rest = projects.filter((project) => project !== featured);
+
   return (
-    <AnimatedSection id="projects" className="cv-auto relative mx-auto w-full max-w-[92rem] px-4 py-20 sm:px-6 lg:px-8">
-      <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end xl:grid xl:grid-cols-12">
-        <div className="max-w-3xl xl:col-span-7">
-          <p className="text-sm font-semibold text-emerald-200">Proyectos</p>
-          <h2 className="mt-3 text-3xl font-semibold text-white sm:text-4xl">
-            Sistemas con foco en operación, IA aplicada, datos y experiencia de usuario.
-          </h2>
-        </div>
-        <p className="max-w-sm text-sm leading-7 text-zinc-400 xl:col-span-4 xl:col-start-9">
-          Una selección de proyectos reales y académicos que muestran backend, desktop, data science, integración de APIs y automatización.
-        </p>
-      </div>
+    <section id="projects" aria-labelledby="projects-title" className="relative py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader
+          id="projects-title"
+          index="03"
+          eyebrow="Proyectos"
+          title="Proyectos reales, con su contexto y estado tal como son."
+          lede="Cada proyecto indica qué resuelve, qué hice y dónde verificarlo. Los privados se marcan como tales."
+        />
 
-      <div className="mt-10 grid gap-4 md:grid-cols-2 xl:gap-5">
-        {projects.map((project, index) => {
-          const Icon = projectIcons[index] ?? ArrowUpRight;
-          const accent = accentClasses[index] ?? accentClasses[0];
-          const hasLinks = Boolean(project.repositoryUrl || project.demoUrl);
-
-          return (
-            <article
-              key={project.name}
-              className="premium-card group rounded-lg p-5 xl:p-6"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <span className={`grid size-11 place-items-center rounded-md border border-white/10 shadow-[0_0_28px_rgba(34,211,238,0.06)] ${accent}`}>
-                  <Icon size={22} aria-hidden="true" />
-                </span>
-                <div className="flex flex-col items-end gap-2">
-                  <span className="tech-chip rounded-md px-3 py-1 font-mono text-xs font-medium text-zinc-300">
-                    {project.focus}
-                  </span>
-                  <span className="rounded-md border border-cyan-200/[0.18] bg-cyan-200/[0.05] px-3 py-1 font-mono text-[11px] text-cyan-100/80">
-                    {project.status}
-                  </span>
-                </div>
-              </div>
-
-              <h3 className="mt-5 text-2xl font-semibold text-white">{project.name}</h3>
-              <p className="mt-3 text-sm leading-7 text-zinc-300">{project.summary}</p>
-              <div className="mt-5 grid gap-3 2xl:grid-cols-3">
-                <div className="border-l-2 border-violet-200/[0.35] pl-4">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Problema</p>
-                  <p className="mt-2 text-sm leading-7 text-zinc-300">{project.problem}</p>
-                </div>
-                <div className="border-l-2 border-cyan-200/[0.45] pl-4">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Resultado</p>
-                  <p className="mt-2 text-sm leading-7 text-zinc-200">{project.result}</p>
-                </div>
-                <div className="border-l-2 border-emerald-200/[0.38] pl-4">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">Impacto</p>
-                  <p className="mt-2 text-sm leading-7 text-zinc-300">{project.impact}</p>
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {project.stack.map((item) => (
-                  <span key={item} className="tech-chip rounded-md px-2.5 py-1 text-xs text-zinc-300">
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              {project.accessNote ? (
-                <p className="mt-5 font-mono text-xs text-zinc-500">{project.accessNote}</p>
-              ) : null}
-
-              {hasLinks ? (
-                <div className="mt-6 flex flex-wrap gap-3 border-t border-white/[0.08] pt-5">
-                  {project.repositoryUrl ? (
-                    <a
-                      href={project.repositoryUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="tech-chip inline-flex h-10 items-center gap-2 rounded-md px-3.5 text-sm font-medium text-zinc-100 transition-colors hover:border-cyan-200/40 hover:bg-white/[0.08] hover:text-white"
-                    >
-                      Ver repositorio
-                      <ArrowUpRight size={15} aria-hidden="true" />
-                    </a>
-                  ) : null}
-                  {project.demoUrl ? (
-                    <a
-                      href={project.demoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex h-10 items-center gap-2 rounded-md bg-emerald-300 px-3.5 text-sm font-semibold text-[#05110c] transition-colors hover:bg-emerald-200"
-                    >
-                      Ver demo
-                      <ArrowUpRight size={15} aria-hidden="true" />
-                    </a>
-                  ) : null}
-                </div>
-              ) : null}
-            </article>
-          );
-        })}
-      </div>
-
-      <div className="premium-surface mt-8 rounded-lg p-5 md:p-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-cyan-200">Laboratorio / más proyectos</p>
-            <h3 className="mt-2 text-2xl font-semibold text-white">Repositorios y exploraciones públicas</h3>
+        <div className="mt-14 space-y-5">
+          <FeaturedProject project={featured} />
+          <div className="grid gap-5 md:grid-cols-2">
+            {rest.map((project, index) => (
+              <ProjectCard key={project.slug} project={project} index={index + 2} />
+            ))}
           </div>
-          <a
-            href="https://github.com/SC-Sergio"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-medium text-emerald-100 transition-colors hover:text-white"
-          >
-            Ver GitHub
-            <ArrowUpRight size={16} aria-hidden="true" />
-          </a>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          {labProjects.map((project) => (
-            <a
-              key={project.name}
-              href={project.href}
-              target="_blank"
-              rel="noreferrer"
-              className="tech-chip rounded-lg p-4 transition-colors hover:border-cyan-200/35 hover:bg-white/[0.08]"
-              aria-label={`Ver ${project.name} en GitHub`}
-            >
-              <span className="flex items-center justify-between gap-3">
-                <span className="font-semibold text-white">{project.name}</span>
-                <ArrowUpRight size={15} className="text-cyan-200" aria-hidden="true" />
-              </span>
-              <span className="mt-3 block text-sm leading-6 text-zinc-400">{project.description}</span>
+
+        <div className="reveal mt-16 rounded-2xl border border-dashed border-line-strong p-6 sm:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="eyebrow">Laboratorio</p>
+              <h3 className="mt-2 font-display text-xl font-semibold text-ink">Ejercicios y proyectos de formación</h3>
+            </div>
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" className="link-arrow text-sm">
+              Todo en GitHub
+              <ArrowUpRight size={15} aria-hidden="true" />
             </a>
-          ))}
+          </div>
+          <ul className="mt-6 grid gap-3 md:grid-cols-3">
+            {labProjects.map((project) => (
+              <li key={project.name}>
+                <a
+                  href={project.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-full flex-col rounded-lg border border-line bg-bg-raised p-4 transition-colors hover:border-cyan/35"
+                >
+                  <span className="flex items-center justify-between gap-3 font-medium text-ink">
+                    <span className="min-w-0 [overflow-wrap:anywhere]">{project.name}</span>
+                    <ArrowUpRight size={15} className="shrink-0 text-muted transition-colors group-hover:text-cyan-soft" aria-hidden="true" />
+                  </span>
+                  <span className="mt-2 text-sm leading-relaxed text-muted">{project.description}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-    </AnimatedSection>
+    </section>
   );
 }
