@@ -190,3 +190,11 @@ test.describe("SEO y rutas", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Esta página no existe.");
   });
 });
+
+test("regresión: el panel del asistente no queda bajo el navbar", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Abrir asistente del portafolio" }).click();
+  const navBottom = await page.locator("header").first().evaluate((element) => element.getBoundingClientRect().bottom);
+  const dialogTop = await page.getByRole("dialog").evaluate((element) => element.getBoundingClientRect().top);
+  expect(dialogTop).toBeGreaterThanOrEqual(navBottom);
+});

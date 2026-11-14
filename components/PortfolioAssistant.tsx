@@ -237,7 +237,7 @@ export default function PortfolioAssistant() {
           role="dialog"
           aria-modal="false"
           aria-labelledby="portfolio-assistant-title"
-          className="pointer-events-auto mb-3 flex max-h-[min(36rem,calc(100svh-6.5rem))] w-full flex-col overflow-hidden rounded-2xl border border-line-strong bg-[#070b12] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.85)] sm:w-[25rem]"
+          className="pointer-events-auto mb-3 flex max-h-[min(36rem,calc(100svh-10rem))] w-full flex-col overflow-hidden rounded-2xl border border-line-strong bg-[#070b12] shadow-[0_24px_80px_-12px_rgba(0,0,0,0.85)] sm:w-[25rem]"
         >
           <header className="flex items-start justify-between gap-4 border-b border-line px-4 py-3.5">
             <div className="min-w-0">

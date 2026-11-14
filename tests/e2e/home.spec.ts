@@ -103,9 +103,21 @@ test.describe("navegación por anclas", () => {
       } else {
         await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: section.label, exact: true }).click();
       }
-      await waitForScrollEnd(page);
       const navBottom = await page.locator("header").first().evaluate((element) => element.getBoundingClientRect().bottom);
-      // La sección queda justo bajo el navbar (scroll-margin) y su título dentro de la vista.
+      // El scroll suave puede pausarse si el hilo principal está ocupado (CI lento, WebGL
+      // compilando), así que se espera la posición final en lugar de una pausa del scroll.
+      await expect
+        .poll(
+          () =>
+            page.locator(`#${section.id}`).evaluate((element) => {
+              const top = element.getBoundingClientRect().top;
+              const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+              return atBottom || top < 104 + 40 ? "settled" : `top=${Math.round(top)}`;
+            }),
+          { timeout: 15_000 },
+        )
+        .toBe("settled");
+      await waitForScrollEnd(page);
       const sectionTop = await page.locator(`#${section.id}`).evaluate((element) => element.getBoundingClientRect().top);
       expect(sectionTop).toBeGreaterThanOrEqual(navBottom - 1);
       const atBottom = await page.evaluate(() => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2);
