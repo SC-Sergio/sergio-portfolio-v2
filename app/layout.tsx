@@ -44,9 +44,19 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+// Corre antes del primer pintado y sin depender de la hidratación:
+// - al recargar, volver atrás o entrar con un ancla, el navegador restaura o calcula una
+//   posición de scroll, así que se renderiza toda la página desde ya;
+// - en una visita nueva, la primera interacción (scroll, toque, tecla) renderiza todo antes
+//   de que el usuario alcance las secciones diferidas. RenderGate completa el resto en reposo.
+const renderAllScript = `(function(){var d=document.documentElement,a=function(){d.dataset.render="all"};try{var n=performance.getEntriesByType("navigation")[0];if(location.hash||(n&&n.type!=="navigate"))return a();["pointerdown","keydown","wheel","touchstart","scroll"].forEach(function(t){addEventListener(t,a,{capture:true,passive:true,once:true})})}catch(e){a()}})()`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es-CL" className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}>
+    <html lang="es-CL" className={`${display.variable} ${body.variable} ${mono.variable} antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: renderAllScript }} />
+      </head>
       <body className="min-h-svh bg-bg font-sans text-ink">{children}</body>
     </html>
   );

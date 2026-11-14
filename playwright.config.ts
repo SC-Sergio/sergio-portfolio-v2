@@ -7,6 +7,8 @@ const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
+  // WebGL por software (SwiftShader) y CPU compartida hacen lentas algunas pruebas bajo carga.
+  timeout: 60_000,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",

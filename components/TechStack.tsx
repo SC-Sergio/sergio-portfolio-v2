@@ -21,7 +21,7 @@ const spans: Record<string, string> = {
 
 export default function TechStack() {
   return (
-    <section id="stack" aria-labelledby="stack-title" className="relative border-y border-line bg-bg-raised py-24 sm:py-32">
+    <section id="stack" aria-labelledby="stack-title" className="defer-render relative border-y border-line bg-bg-raised py-24 sm:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           id="stack-title"

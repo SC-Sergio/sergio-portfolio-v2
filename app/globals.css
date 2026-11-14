@@ -109,6 +109,22 @@ body {
   top: 0.75rem;
 }
 
+/* ─── Primer pintado ─────────────────────────────────────────────────────── */
+/* Las secciones bajo el Hero no se maquetan en el primer pintado (medido: el layout
+   inicial en móvil bajaba de ~450 a ~200 ms). Solo dura la carga: RenderGate y el
+   script del layout las activan (de a una, en momentos ociosos) y desde ahí todo se renderiza normal,
+   con altura de documento estable. Con un ancla en la URL se renderiza todo desde ya. */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1100px;
+}
+
+.defer-render[data-rendered],
+html[data-render="all"] .defer-render,
+html:has(:target) .defer-render {
+  content-visibility: visible;
+}
+
 /* ─── Componentes de superficie ──────────────────────────────────────────── */
 
 /* Panel con esquinas tipo HUD: cuatro marcas dibujadas con gradientes (sin capas extra). */

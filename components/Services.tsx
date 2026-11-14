@@ -4,7 +4,7 @@ import { services } from "@/data/skills";
 
 export default function Services() {
   return (
-    <section id="services" aria-labelledby="services-title" className="relative border-y border-line bg-bg-raised py-24 sm:py-32">
+    <section id="services" aria-labelledby="services-title" className="defer-render relative border-y border-line bg-bg-raised py-24 sm:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           id="services-title"

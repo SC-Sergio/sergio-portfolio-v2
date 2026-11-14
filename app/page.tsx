@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
 import PortfolioAssistant from "@/components/PortfolioAssistant";
 import Projects from "@/components/Projects";
+import RenderGate from "@/components/RenderGate";
 import Services from "@/components/Services";
 import TechStack from "@/components/TechStack";
 import { profile } from "@/data/profile";
@@ -52,6 +53,7 @@ export default function Home() {
       </main>
       <Footer />
       <PortfolioAssistant />
+      <RenderGate />
     </>
   );
 }
