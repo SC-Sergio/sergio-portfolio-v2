@@ -113,7 +113,10 @@ INP no se midió (requiere interacción real de usuarios).
 
 ## Próxima acción
 
-Ver la última fila de la bitácora.
+1. Esperar CI verde del PR #11 (el repositorio no permite auto-merge) y hacer squash merge.
+2. Verificar que Vercel Production sirve el commit fusionado y abre sin login en incógnito.
+3. Correr la suite contra producción: `E2E_BASE_URL=https://sergio-portfolio-v2-roan.vercel.app npx playwright test`.
+4. Anotar el SHA fusionado y el resultado en esta bitácora y en el checkpoint.
 
 ## Bitácora
 
@@ -124,3 +127,4 @@ Ver la última fila de la bitácora.
 | 2026-11-19 | Carey Assistant capturado (6 vistas); LiterAlura compilado y probado (4/4); ForoHub no compila |
 | 2026-11-19 | LiterAlura: bug del 301 diagnosticado; PR SC-Sergio/Challengeliteralura#2, CI verde, squash `730576d` |
 | 2026-11-19 | Commits `511da9c`…`ff663c6` en la rama: medios, casos de estudio, demos, portada, pruebas |
+| 2026-11-19 | PR SC-Sergio/sergio-portfolio-v2#11 abierto; CI en curso; Auto-fix del app activado |
