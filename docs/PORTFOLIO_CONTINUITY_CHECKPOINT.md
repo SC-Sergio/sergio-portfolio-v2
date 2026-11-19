@@ -1,14 +1,15 @@
 # CHECKPOINT DE CONTINUIDAD — Sergio Portfolio V3 → V3.5
 
-> **Actualización 19-nov-2026 — V3.5 en ejecución autorizada.** El propietario entregó la orden maestra V3.5 con autorización
-> para implementar, probar, fusionar (squash, con CI verde) y publicar. Estado, inventario, evidencias, mediciones y próxima
-> acción viven en **`docs/PORTFOLIO_V35_EXECUTION.md`**; leerlo primero. Resumen:
-> - Casos de estudio `/proyectos/<slug>` (6), demos `/demos/pegasus` (funcional), `/demos/spacex` (funcional) y
->   `/demos/fastlaundry` (simulada, marca genérica), galerías con capturas reales rotuladas y rieles del Hero ≥1600/≥1840 px.
-> - Decisiones resueltas en esta fase: FastLaundry sin capturas originales (no hay autorización) → demo nueva con datos ficticios;
->   Carey Assistant capturado desde la build QA local; Hero con índice izquierdo y accesos a demos a la derecha.
-> - Siguen pendientes del propietario: las tres confirmaciones de CV (sección 2), la compra del dominio y el origen/licencia del
->   arte «Airi» que aparece en una captura de Carey Assistant; decidir si se corrige ForoHub para que compile.
+> **Actualización 19-nov-2026 — V3.5 PUBLICADA.** PR #11 fusionado por squash como
+> **`b642d1ecc3273335352eccc3e7b979052c8ff0df`**; CI de `main` en verde y Vercel Production sirviendo ese commit en
+> https://sergio-portfolio-v2-roan.vercel.app (público, sin login). E2E contra producción: 126 aprobadas, 10 omitidas por diseño,
+> 0 fallidas. Rollback: `debcd07`. Detalle, evidencias y mediciones en **`docs/PORTFOLIO_V35_EXECUTION.md`**; leerlo primero.
+> - Publicado: casos de estudio `/proyectos/<slug>` (6); demos `/demos/pegasus` (funcional), `/demos/spacex` (funcional) y
+>   `/demos/fastlaundry` (simulada, marca genérica, sin conexión con el sistema real); 17 capturas/gráficos rotulados; rieles
+>   del Hero desde 1600/1840 px.
+> - Repos externos: SC-Sergio/Challengeliteralura#2 (arreglo del 301 de Gutendex) fusionado como `730576d`.
+> - Pendientes solo del propietario: tres confirmaciones del CV (sección 2), compra del dominio, licencia de la ilustración
+>   «Airi» (la vista «Inicio» de Carey se retiró por eso) y decidir si se corrige ForoHub para que compile.
 > - Las secciones siguientes conservan el texto original del 17-nov-2026 como contexto histórico.
 
 **Fecha:** 17 de noviembre de 2026  

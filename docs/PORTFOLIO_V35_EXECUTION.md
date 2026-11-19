@@ -5,8 +5,21 @@ Evidencia visual, casos de estudio, demos y aprovechamiento ultrawide. Si una se
 
 ## Estado actual
 
-- Rama `feat/portfolio-v35-interactive-showcase`, creada desde `origin/main` = `debcd07` (verificado el 19-nov-2026).
-- Implementado, probado en local y medido; ver **Bitácora** para PR, CI y despliegue.
+- **V3.5 publicada.** PR #11 fusionado por squash como **`b642d1ecc3273335352eccc3e7b979052c8ff0df`** (19-nov-2026, 14:55 UTC),
+  fijando el HEAD `cda53c4`; el árbol fusionado es idéntico al del PR. Base anterior: `debcd07`. Punto de rollback: `debcd07`.
+- CI posterior al merge (run 44549036430): **success**. Vercel Production (deployment 7916717038): **success**, sirve `b642d1e`.
+- URL pública sin autenticación (verificada sin cookies ni redirecciones, 200): https://sergio-portfolio-v2-roan.vercel.app
+
+### URL publicadas (verificadas en producción)
+
+| Página | URL |
+| --- | --- |
+| Portada | https://sergio-portfolio-v2-roan.vercel.app |
+| Demo Pegasus (funcional) | https://sergio-portfolio-v2-roan.vercel.app/demos/pegasus |
+| Demo SpaceX (funcional) | https://sergio-portfolio-v2-roan.vercel.app/demos/spacex |
+| Demo FastLaundry (simulada) | https://sergio-portfolio-v2-roan.vercel.app/demos/fastlaundry |
+| Casos de estudio | `/proyectos/pegasus`, `/proyectos/carey-assistant`, `/proyectos/fastlaundry`, `/proyectos/literalura`, `/proyectos/spacex`, `/proyectos/forohub` |
+| CV | https://sergio-portfolio-v2-roan.vercel.app/cv |
 
 ## Objetivos (orden maestra V3.5, 19-nov-2026)
 
@@ -113,12 +126,31 @@ INP no se midió (requiere interacción real de usuarios).
 | `.btn` (CSS sin capa) gana a `hidden` de Tailwind: el botón «Contactar» del navbar de la portada se ve en móvil aunque la intención era ocultarlo | En subpáginas se resolvió con un contenedor; en la portada se dejó igual (preexistente, sin desbordamiento) |
 | Gutendex intermitente | Externo |
 
+## Verificación en producción (19-nov-2026, `b642d1e`)
+
+- `E2E_BASE_URL=https://sergio-portfolio-v2-roan.vercel.app npx playwright test`: **126 aprobadas, 10 omitidas por diseño,
+  0 fallidas, 0 reintentos**. Incluye los 6 casos de estudio, galerías, demos Pegasus/SpaceX/FastLaundry, ForoHub, LiterAlura,
+  rieles ultrawide, ausencia de Three.js en móvil, navegación, anclas, menú móvil y asistente.
+- Las 10 omisiones son pruebas de un solo perfil (8 solo desktop, 2 solo móvil); cada una pasa en su perfil complementario.
+- La captura retirada `/media/carey-assistant/inicio.webp` responde **404** en producción y no está en el árbol de `main`
+  (sí permanece en el historial de la rama del PR #11 en GitHub).
+- `scripts/measure-perf.mjs` contra producción, dos corridas de mediana de 3:
+
+| Perfil | FCP = LCP | TBT | CLS | JS | Three.js |
+| --- | --- | --- | --- | --- | --- |
+| Móvil (CPU ×4, 4G lenta) | 1056 / 1116 ms | 131 / 144 ms | 0 | 164 KB | no |
+| Desktop 1440 | 524 / 512 ms | 40 / 68 ms | 0 | 421 / 399 KB | sí (diferido) |
+
+  Referencia del cierre V3 en producción: móvil LCP ~1040 ms y TBT 145–170 ms. Sin regresión grave; son mediciones de laboratorio
+  con red remota (ruido de ±100 ms entre corridas).
+
 ## Próxima acción
 
-1. Esperar CI verde del PR #11 (el repositorio no permite auto-merge) y hacer squash merge.
-2. Verificar que Vercel Production sirve el commit fusionado y abre sin login en incógnito.
-3. Correr la suite contra producción: `E2E_BASE_URL=https://sergio-portfolio-v2-roan.vercel.app npx playwright test`.
-4. Anotar el SHA fusionado y el resultado en esta bitácora y en el checkpoint.
+No queda trabajo técnico autorizado pendiente. Bloqueos externos, todos del propietario:
+1. Confirmar los tres datos del CV (Tupoclick vigente, razón social de Vending Store, disponibilidad remota).
+2. Decidir la compra de `sergiocareydev.cl` (no comprado).
+3. Confirmar origen y licencia de la ilustración «Airi» antes de republicar la vista «Inicio» de Carey Assistant.
+4. Decidir si se corrige ForoHub para que compile desde un clon limpio.
 
 ## Bitácora
 
@@ -130,3 +162,6 @@ INP no se midió (requiere interacción real de usuarios).
 | 2026-11-19 | LiterAlura: bug del 301 diagnosticado; PR SC-Sergio/Challengeliteralura#2, CI verde, squash `730576d` |
 | 2026-11-19 | Commits `511da9c`…`ff663c6` en la rama: medios, casos de estudio, demos, portada, pruebas |
 | 2026-11-19 | PR SC-Sergio/sergio-portfolio-v2#11 abierto; CI en curso; Auto-fix del app activado |
+| 2026-11-19 | Revisión final: se retira la captura de inicio de Carey («Airi», licencia sin confirmar); HEAD `cda53c4`, CI verde (126/10, sin reintentos) |
+| 2026-11-19 | Squash merge del PR #11 → `b642d1e`; CI de `main` success; Vercel Production success |
+| 2026-11-19 | E2E contra producción 126/10/0; rendimiento móvil en producción dentro de la referencia V3 |
