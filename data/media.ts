@@ -119,19 +119,8 @@ export const media: MediaItem[] = [
   },
 
   // ─── Carey Assistant ──────────────────────────────────────────────────────
-  {
-    id: "carey-inicio",
-    project: "carey-assistant",
-    src: "/media/carey-assistant/inicio.webp",
-    width: 1440,
-    height: 900,
-    bytes: 70608,
-    alt: "Carey Assistant en Windows: dashboard personal con estado del asistente, memoria local, voz, automatización y noticias.",
-    caption: "Inicio: estado del asistente y módulos locales (memoria manual, voz, rutinas y briefing).",
-    kind: "captura-local",
-    origin: careyLocal,
-    date: "2026-11-19",
-  },
+  // La vista «Inicio» no se publica: muestra la ilustración del personaje «Airi», cuyo origen y
+  // licencia están pendientes de confirmar por el propietario.
   {
     id: "carey-asistente",
     project: "carey-assistant",

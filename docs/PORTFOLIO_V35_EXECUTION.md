@@ -30,12 +30,13 @@ demo simulada. No se crearon mockups conceptuales presentados como capturas.
 ## Recursos obtenidos
 
 Manifiesto completo con origen, fecha, tamaño y texto alternativo: `data/media.ts`. Archivos en `public/media/<proyecto>/`
-(WebP, 6–76 KB cada uno, 752 KB en total). Originales de las capturas nuevas: `docs/media-originals/` (WebP sin pérdida).
+(WebP, 6–76 KB cada uno, 17 recursos). Originales de las capturas nuevas: `docs/media-originals/` (WebP sin pérdida).
 
 - **Pegasus**: `local-inicio`, `local-abstencion` (19-nov-2026); `oci-inicio` (barra del navegador con IP recortada),
   `oci-respuesta-technical-lead`, `oci-evidencia-incidentes`, `oci-evidencia-frontend` (jul. 2026, del repo).
   **Excluida**: `04-oci-instance-running.jpeg` (muestra IP pública, parte del OCID y compartimento).
-- **Carey Assistant**: inicio, asistente, IA local, proyectos, configuración, investigación (build QA 94628fc).
+- **Carey Assistant**: asistente, IA local, proyectos, configuración, investigación (build QA 94628fc). La vista «Inicio» se
+  capturó pero **se retiró en la revisión final**: muestra la ilustración «Airi», sin licencia confirmada.
 - **SpaceX**: tendencia anual, éxito por órbita, sitio vs carga, órbita vs vuelo, carga vs vuelo, matriz del árbol.
 - **Datos de demo**: `public/demos/pegasus/retrieval.json` (23 consultas reales, 85 KB) y `chunks.json` (312 chunks,
   305 KB, solo se descarga al hacer una pregunta libre). Generados con el pipeline real (script en el scratchpad de la sesión;
@@ -55,8 +56,9 @@ Manifiesto completo con origen, fecha, tamaño y texto alternativo: `data/media.
 ## Permisos, confidencialidad y riesgos
 
 - FastLaundry: no se abrió ni clonó el repositorio privado; la demo no reutiliza código, interfaz ni datos. No hay capturas del sistema.
-- Carey Assistant: solo capturas de la interfaz; código privado intacto. El arte del personaje «Airi» aparece en la captura de inicio:
-  **confirmar con el propietario el origen/licencia de esa ilustración** antes de usarla fuera del portafolio.
+- Carey Assistant: solo capturas de la interfaz; código privado intacto. La captura de «Inicio» se retiró del sitio y del
+  repositorio porque muestra la ilustración del personaje «Airi»; **el propietario debe confirmar su origen y licencia** antes de
+  publicarla (el archivo sigue en el historial de la rama del PR #11, no en `main`).
 - No se publicaron claves ni `.env`; Pegasus corrió sin `GEMINI_API_KEY`.
 - Repos externos modificados: solo `SC-Sergio/Challengeliteralura` (PR #2, 1 línea, CI verde, squash `730576d`).
 
