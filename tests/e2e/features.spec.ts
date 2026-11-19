@@ -18,9 +18,11 @@ test.describe("proyectos", () => {
     }
   });
 
-  test("los proyectos privados no exponen enlaces", async ({ page }) => {
+  test("los proyectos privados no exponen enlaces externos", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("#project-fastlaundry a")).toHaveCount(0);
+    // Solo enlaces internos: caso de estudio y demo conceptual. Nada hacia repositorios o sistemas.
+    await expect(page.locator('#project-fastlaundry a[href^="http"]')).toHaveCount(0);
+    await expect(page.locator("#project-fastlaundry a")).toHaveCount(2);
     await expect(page.locator("#project-fastlaundry")).toContainText("Código privado");
   });
 });
