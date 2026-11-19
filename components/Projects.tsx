@@ -1,6 +1,11 @@
-import { ArrowUpRight, Download, Lock } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import EvidenceBadge from "@/components/EvidenceBadge";
+import ProjectActions from "@/components/ProjectActions";
+import ProjectFlow from "@/components/ProjectFlow";
 import SectionHeader from "@/components/SectionHeader";
-import { GitHubIcon } from "@/components/icons";
+import { mediaById } from "@/data/media";
 import { labProjects, projects, type Project, type ProjectCategory } from "@/data/projects";
 import { profile } from "@/data/profile";
 
@@ -11,54 +16,26 @@ const categoryTone: Record<ProjectCategory, string> = {
   Escritorio: "border-sky-300/35 bg-sky-300/10 text-sky-200",
 };
 
-/** Flujo técnico del proyecto como cadena de nodos (HTML accesible, se adapta al ancho). */
-function ProjectFlow({ steps, label }: { steps: string[]; label: string }) {
+/** Portada real (o rotulada) del proyecto; diferida porque la sección está bajo el pliegue. */
+function ProjectCover({ project, sizes }: { project: Project; sizes: string }) {
+  const cover = project.cover ? mediaById(project.cover) : undefined;
+  if (!cover) return null;
   return (
-    <ol aria-label={`Flujo técnico de ${label}`} className="flex flex-wrap items-center gap-y-2">
-      {steps.map((step, index) => (
-        <li key={step} className="flex items-center">
-          <span className="rounded-md border border-line-strong bg-bg/70 px-2.5 py-1 font-mono text-[0.7rem] text-ink-soft">
-            {step}
-          </span>
-          {index < steps.length - 1 ? (
-            <span aria-hidden="true" className="mx-1.5 flex items-center text-cyan/70">
-              <span className="h-px w-3 bg-current sm:w-5" />
-              <span className="size-0 border-y-[3px] border-l-[5px] border-y-transparent border-l-current" />
-            </span>
-          ) : null}
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function ProjectLinks({ project }: { project: Project }) {
-  if (project.links.length === 0) {
-    return (
-      <p className="inline-flex items-center gap-2 font-mono text-xs text-muted">
-        <Lock size={13} aria-hidden="true" />
-        Sin enlace público
-      </p>
-    );
-  }
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {project.links.map((link) => (
-        <a
-          key={link.href}
-          href={link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-ghost h-10 px-3.5"
-          aria-label={`${link.label} de ${project.name} en GitHub (se abre en una pestaña nueva)`}
-        >
-          {link.kind === "release" ? <Download size={15} aria-hidden="true" /> : <GitHubIcon size={15} />}
-          {link.label}
-          <ArrowUpRight size={14} aria-hidden="true" className="text-muted" />
-        </a>
-      ))}
-    </div>
+    <Link href={`/proyectos/${project.slug}#galeria`} className="group block overflow-hidden rounded-xl border border-line" aria-label={`Ver capturas de ${project.name}`}>
+      <span className={`relative block aspect-[16/9] overflow-hidden ${cover.light ? "bg-white" : "bg-bg"}`}>
+        <Image
+          src={cover.src}
+          alt={cover.alt}
+          fill
+          sizes={sizes}
+          className={`transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none ${cover.light ? "object-contain p-2" : "object-cover object-top"}`}
+        />
+      </span>
+      <span className="flex items-center justify-between gap-2 border-t border-line bg-bg-raised px-3 py-2">
+        <EvidenceBadge kind={cover.kind} />
+        <span className="font-mono text-[0.68rem] text-muted transition-colors group-hover:text-cyan-soft">Ver capturas →</span>
+      </span>
+    </Link>
   );
 }
 
@@ -107,11 +84,12 @@ function FeaturedProject({ project }: { project: Project }) {
         </dl>
 
         <div className="mt-8">
-          <ProjectLinks project={project} />
+          <ProjectActions project={project} context="card" size="sm" />
         </div>
       </div>
 
       <div className="relative space-y-7 lg:col-span-5">
+        <ProjectCover project={project} sizes="(min-width: 1024px) 460px, 100vw" />
         <div className="rounded-xl border border-line bg-bg/60 p-5">
           <p className="font-mono text-[0.7rem] uppercase tracking-[0.16em] text-muted">Arquitectura</p>
           <div className="mt-4">
@@ -161,6 +139,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       <p className="mt-1 font-mono text-[0.72rem] text-cyan-soft/80">{project.status}</p>
       <p className="mt-4 leading-relaxed text-ink-soft">{project.summary}</p>
 
+      {project.cover ? (
+        <div className="mt-5">
+          <ProjectCover project={project} sizes="(min-width: 768px) 560px, 100vw" />
+        </div>
+      ) : null}
+
       <div className="mt-5 rounded-lg border border-line bg-bg/50 p-4">
         <ProjectFlow steps={project.flow} label={project.name} />
       </div>
@@ -203,7 +187,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       {project.note ? <p className="mt-4 text-xs leading-relaxed text-muted">{project.note}</p> : null}
 
       <div className="mt-auto pt-6">
-        <ProjectLinks project={project} />
+        <ProjectActions project={project} context="card" size="sm" />
       </div>
     </article>
   );
@@ -221,7 +205,7 @@ export default function Projects() {
           index="03"
           eyebrow="Proyectos"
           title="Proyectos reales, con su contexto y estado tal como son."
-          lede="Cada proyecto indica qué resuelve, qué hice y dónde verificarlo. Los privados se marcan como tales."
+          lede="Cada proyecto tiene su caso de estudio con evidencia rotulada: capturas reales, demos funcionales o simulaciones, y los privados se marcan como tales."
         />
 
         <div className="mt-14 space-y-5">
