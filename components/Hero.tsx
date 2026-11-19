@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, FileText, MapPin } from "lucide-react";
+import { ArrowDown, ArrowUpRight, FileText, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { GitHubIcon, LinkedInIcon } from "@/components/icons";
@@ -14,6 +14,7 @@ import {
 } from "@/components/Scene3DBoundary";
 import { useDeferredSceneRequest } from "@/components/useDeferredSceneRequest";
 import { useHeroSceneMode } from "@/components/useHeroSceneMode";
+import { navSections } from "@/data/navigation";
 import { profile } from "@/data/profile";
 
 function SceneLoadErrorFallback() {
@@ -60,6 +61,15 @@ const coreTags = [
   { text: "django.api", className: "left-[81%] top-[30%]" },
   { text: "llm.local", className: "left-[51%] top-[68%]" },
   { text: "automation", className: "left-[79%] top-[72%]" },
+];
+
+// Rieles laterales para pantallas anchas (solo HTML/CSS, sin JS ni animación). Se muestran
+// donde hay margen libre medido: el izquierdo desde 1600 px y el derecho desde 1840 px, donde ya no
+// se cruza con las órbitas ni las etiquetas del núcleo.
+const demoLinks = [
+  { href: "/demos/pegasus", name: "Pegasus", detail: "Recuperación RAG real" },
+  { href: "/demos/spacex", name: "SpaceX Falcon 9", detail: "Dashboard del notebook" },
+  { href: "/demos/fastlaundry", name: "Lavandería", detail: "Demo conceptual simulada" },
 ];
 
 const iconLink =
@@ -120,6 +130,51 @@ export default function Hero() {
           </span>
         ))}
       </div>
+
+      <nav
+        aria-label="Índice de la página"
+        className="absolute left-[calc((100%-80rem)/4)] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 min-[1600px]:block"
+      >
+        <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted">Índice</p>
+        <ol className="mt-4 space-y-1 border-l border-line">
+          {navSections.map((section, index) => (
+            <li key={section.id}>
+              <a
+                href={`#${section.id}`}
+                className="-ml-px flex items-baseline gap-3 border-l border-transparent py-1.5 pl-4 text-sm text-ink-soft transition-colors hover:border-cyan hover:text-ink"
+              >
+                <span className="font-mono text-[0.68rem] text-muted">0{index + 1}</span>
+                {section.label}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <aside
+        aria-labelledby="hero-demos-title"
+        className="absolute right-[calc((100%-80rem)/4)] top-1/2 hidden w-56 -translate-y-1/2 translate-x-1/2 min-[1840px]:block"
+      >
+        <p id="hero-demos-title" className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted">
+          Demos en vivo
+        </p>
+        <ul className="mt-4 space-y-2">
+          {demoLinks.map((demo) => (
+            <li key={demo.href}>
+              <a href={demo.href} className="group block rounded-lg border border-line bg-bg/80 px-3.5 py-3 transition-colors hover:border-cyan/40">
+                <span className="flex items-center justify-between gap-2 text-sm font-medium text-ink">
+                  {demo.name}
+                  <ArrowUpRight size={14} aria-hidden="true" className="text-muted transition-colors group-hover:text-cyan-soft" />
+                </span>
+                <span className="mt-0.5 block text-xs text-muted">{demo.detail}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="#projects" className="mt-4 inline-block font-mono text-[0.7rem] text-cyan-soft/80 hover:text-cyan-soft">
+          6 casos de estudio ↓
+        </a>
+      </aside>
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 items-center px-4 sm:px-6 lg:px-8">
         <div className={`w-full max-w-2xl py-12 lg:py-20 ${heroEnter} starting:translate-y-6`}>

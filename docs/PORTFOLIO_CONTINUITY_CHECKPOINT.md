@@ -1,4 +1,16 @@
 # CHECKPOINT DE CONTINUIDAD — Sergio Portfolio V3 → V3.5
+
+> **Actualización 19-nov-2026 — V3.5 en ejecución autorizada.** El propietario entregó la orden maestra V3.5 con autorización
+> para implementar, probar, fusionar (squash, con CI verde) y publicar. Estado, inventario, evidencias, mediciones y próxima
+> acción viven en **`docs/PORTFOLIO_V35_EXECUTION.md`**; leerlo primero. Resumen:
+> - Casos de estudio `/proyectos/<slug>` (6), demos `/demos/pegasus` (funcional), `/demos/spacex` (funcional) y
+>   `/demos/fastlaundry` (simulada, marca genérica), galerías con capturas reales rotuladas y rieles del Hero ≥1600/≥1840 px.
+> - Decisiones resueltas en esta fase: FastLaundry sin capturas originales (no hay autorización) → demo nueva con datos ficticios;
+>   Carey Assistant capturado desde la build QA local; Hero con índice izquierdo y accesos a demos a la derecha.
+> - Siguen pendientes del propietario: las tres confirmaciones de CV (sección 2), la compra del dominio y el origen/licencia del
+>   arte «Airi» que aparece en una captura de Carey Assistant; decidir si se corrige ForoHub para que compile.
+> - Las secciones siguientes conservan el texto original del 17-nov-2026 como contexto histórico.
+
 **Fecha:** 17 de noviembre de 2026  
 **Estado:** diagnóstico y planificación; **NO hay autorización todavía para implementar la V3.5**.  
 **Repositorio:** https://github.com/SC-Sergio/sergio-portfolio-v2  
