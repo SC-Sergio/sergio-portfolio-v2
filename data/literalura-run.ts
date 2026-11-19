@@ -1,6 +1,6 @@
 // Transcripción de una ejecución real de LiterAlura (19-nov-2026), generada desde la salida estándar.
 // Entorno: Java 17, PostgreSQL 17 aislado en local, API pública de Gutendex, rama fix/gutendex-redirect
-// (SC-Sergio/Challengeliteralura#2). Las entradas se enviaron por stdin y se intercalan tras cada prompt.
+// (SC-Sergio/Challengeliteralura#2, fusionada como 730576d). Las entradas se enviaron por stdin y se intercalan tras cada prompt.
 
 export type TerminalLine = { text: string; input?: boolean; prompt?: string };
 export type TerminalRun = { command: string; caption: string; lines: TerminalLine[] };
@@ -8,7 +8,7 @@ export type TerminalRun = { command: string; caption: string; lines: TerminalLin
 export const literaluraRun: TerminalRun = {
   command: "java -jar target/literalura-0.0.1-SNAPSHOT.jar",
   caption:
-    "Salida real del 19-nov-2026 con PostgreSQL local aislado y la API pública de Gutendex, usando el arreglo de la PR #2 del repositorio. Las entradas (en cian) se enviaron por stdin; tras la primera vez se omite la repetición del menú.",
+    "Salida real del 19-nov-2026 con PostgreSQL local aislado y la API pública de Gutendex, con el arreglo de la PR #2, ya fusionado en main. Las entradas (en cian) se enviaron por stdin; tras la primera vez se omite la repetición del menú.",
   lines: [
   {
     "text": "LiterAlura - catálogo de libros con Gutendex"

@@ -298,7 +298,7 @@ export const projects: Project[] = [
         "El repositorio ejecuta las pruebas con Maven en GitHub Actions.",
       ],
       limitations: [
-        "La auditoría encontró un bug: Gutendex responde 301 a /books?search= y el cliente HTTP del JDK no sigue redirecciones, así que toda búsqueda devolvía «no encontrado». Se corrigió con un cambio de una línea en la PR #2 del repositorio.",
+        "La auditoría encontró un bug: Gutendex responde 301 a /books?search= y el cliente HTTP del JDK no sigue redirecciones, así que toda búsqueda devolvía «no encontrado». Se corrigió con un cambio de una línea, fusionado en main el 19-nov-2026 (PR #2).",
         "Depende de la disponibilidad de la API pública de Gutendex, que durante la auditoría respondió con intermitencia.",
         "Es una aplicación de consola: no hay demo web en vivo.",
       ],

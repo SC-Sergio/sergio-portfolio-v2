@@ -22,7 +22,10 @@ El sitio funciona como la portada técnica de mi trabajo y reúne:
 - servicios y formas de contacto;
 - una experiencia visual 3D ligera;
 - un asistente local del portafolio sin APIs externas ni claves privadas;
-- metadata SEO, Open Graph, Twitter cards, sitemap, robots y JSON-LD.
+- metadata SEO, Open Graph, Twitter cards, sitemap, robots y JSON-LD;
+- **casos de estudio** por proyecto en `/proyectos/<slug>` con galería de capturas rotuladas (real o simulada);
+- **demos** en `/demos/pegasus` (recuperación RAG real), `/demos/spacex` (dashboard del notebook) y
+  `/demos/fastlaundry` (prototipo conceptual con datos ficticios, sin relación con el sistema privado).
 
 ## Proyectos destacados
 
@@ -45,13 +48,15 @@ Los datos de cada proyecto se verificaron contra su repositorio público; ver `d
 ## Arquitectura
 
 ```text
-app/          layout, página, /cv, 404, sitemap, robots, manifest, iconos e imágenes sociales
+app/          layout, página, /cv, /proyectos/[slug], /demos/*, 404, sitemap, robots, manifest, iconos e imágenes sociales
 components/   Navbar, Hero (+ Scene3D, HeroCoreStatic, boundary), About, TechStack, Projects,
               Services, Contact, Footer, PortfolioAssistant
-data/         profile, projects, skills, navigation, assistant (contenido separado de la vista)
+data/         profile, projects (+ casos de estudio), media (manifiesto de capturas), spacex, literalura-run,
+              skills, navigation, assistant (contenido separado de la vista)
+public/       media/<proyecto>/ (WebP) y demos/pegasus/ (recuperaciones reales y chunks)
 lib/          site (URL canónica), socialImage
 tests/        unit/ (asistente) y e2e/ (navegación, anclas, 3D, SEO, responsive…)
-scripts/      measure-perf.mjs, screenshots.mjs
+scripts/      measure-perf.mjs, ab-perf.mjs, screenshots.mjs, optimize-media.mjs, build-cv-pdf.mjs
 ```
 
 ## Asistente local
